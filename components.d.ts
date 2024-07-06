@@ -7,9 +7,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CalendarMonth: typeof import('./src/components/Calendar/CalendarMonth.vue')['default']
     CalendarYear: typeof import('./src/components/Calendar/CalendarYear.vue')['default']
+    copy: typeof import('./src/components/Calendar/CalendarYear copy.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']
+    ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']

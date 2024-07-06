@@ -29,6 +29,9 @@
             <el-option v-for="item in dateFormatList" :key="item" :label="item" :value="item" />
           </el-select>
         </el-form-item>
+        <el-form-item label="是否需要农历">
+          <el-checkbox v-model="form.needChinese" label="农历" />
+        </el-form-item>
       </el-form>
     </div>
     <div class="component-box">
@@ -39,6 +42,7 @@
         :week-start="form.weekStart"
         :month-format="form.monthFormat"
         :date-format="form.dateFormat"
+        :need-chinese="form.needChinese"
         @increase-year="increaseYear"
         @reduce-year="reduceYear"
         @to-now-year="toNowYear"
@@ -57,7 +61,8 @@ const form = ref({
   minWeek: 0,
   weekStart: 1,
   monthFormat: 'YYYY-MM',
-  dateFormat: 'DD'
+  dateFormat: 'DD',
+  needChinese: true
 })
 
 const weekNames = ref([
@@ -89,7 +94,7 @@ function toNowYear() {
   display: flex;
   align-items: flex-start;
   .form-box {
-    flex: 0 0 400px;
+    flex: 0 0 280px;
     margin-right: 12px;
   }
   .component-box {
