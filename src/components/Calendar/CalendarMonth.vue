@@ -14,7 +14,7 @@
         }"
       >
         <div class="calendar-month-cell-title">
-          <div class="calendar-month-cell-row">{{ date.date }}</div>
+          <div class="calendar-month-cell-row" :title="date.date">{{ date.date }}</div>
           <div
             v-if="props.needChinese"
             class="calendar-month-cell-row calendar-month-cell-chinese"
