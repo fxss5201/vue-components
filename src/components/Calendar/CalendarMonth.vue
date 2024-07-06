@@ -1,5 +1,5 @@
 <template>
-  <div class="calendar-month">
+  <div :key="renderKey" class="calendar-month">
     <div class="calendar-month-head">{{ monthData.month }}</div>
     <div class="calendar-month-body">
       <div v-for="week in weekNameList" :key="week" class="calendar-month-cell">{{ week }}</div>
