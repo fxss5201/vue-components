@@ -17,9 +17,12 @@
             v-for="date in item.children"
             :key="date.date"
             class="calendar-month-cell"
-            :class="{ 'calendar-month-cell-not': !date.isIn }"
+            :class="{
+              'calendar-month-cell-not': !date.isIn,
+              'calendar-month-cell-now': date.isNow
+            }"
           >
-            {{ date.date }}
+            <div class="calendar-month-cell-title">{{ date.date }}</div>
           </div>
         </div>
       </div>
@@ -47,6 +50,7 @@ const monthList = ref<MonthType[]>([])
 const weekNameList = ref<string[]>([])
 const weekNames = ['日', '一', '二', '三', '四', '五', '六']
 const renderKey = ref(new Date().getTime())
+const nowDate = ref(dayjs())
 
 watch(
   () => props,
@@ -95,6 +99,7 @@ interface OptionType {
 interface DateType {
   date: string
   isIn: boolean
+  isNow: boolean
 }
 
 interface MonthType {
@@ -155,7 +160,10 @@ function getMonthCalendar(year: number, month: number, option: OptionType = {}):
   for (let index = 0; index < cellDays; index++) {
     monthChildren.push({
       date: dayjs(cellStart).add(index, 'day').format(configOption.dateFormat),
-      isIn: preEndDate <= index && index < nextStartDate
+      isIn: preEndDate <= index && index < nextStartDate,
+      isNow:
+        dayjs(cellStart).add(index, 'day').format('YYYY-MM-DD') ===
+        nowDate.value.format('YYYY-MM-DD')
     })
   }
 
@@ -223,17 +231,23 @@ function getYearCalendar(year: number, option: OptionType = {}): MonthType[] {
     }
     .calendar-month-cell {
       flex: 0 0 calc(100% / 7);
-      text-align: center;
       padding: 6px 4px;
       border-top: 1px solid var(--el-border-color);
       border-left: 1px solid var(--el-border-color);
       word-break: break-all;
+      display: flex;
+      justify-content: center;
     }
     .calendar-month-cell:nth-child(7n + 1) {
       border-left: 0;
     }
     .calendar-month-cell-not {
       color: #ccc;
+    }
+    .calendar-month-cell-now {
+      .calendar-month-cell-title {
+        color: hsla(160, 100%, 37%, 1);
+      }
     }
   }
 }

@@ -89,7 +89,7 @@ function toNowYear() {
   display: flex;
   align-items: flex-start;
   .form-box {
-    flex: 0 0 500px;
+    flex: 0 0 400px;
     margin-right: 12px;
   }
   .component-box {
