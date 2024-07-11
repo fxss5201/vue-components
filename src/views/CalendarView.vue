@@ -29,6 +29,9 @@
             <el-option v-for="item in dateFormatList" :key="item" :label="item" :value="item" />
           </el-select>
         </el-form-item>
+        <el-form-item label="是否需要假期">
+          <el-checkbox v-model="form.needHoliday" label="假期" />
+        </el-form-item>
         <el-form-item label="是否需要农历">
           <el-checkbox v-model="form.needChinese" label="农历" />
         </el-form-item>
@@ -42,6 +45,7 @@
         :week-start="form.weekStart"
         :month-format="form.monthFormat"
         :date-format="form.dateFormat"
+        :need-holiday="form.needHoliday"
         :need-chinese="form.needChinese"
         @increase-year="increaseYear"
         @reduce-year="reduceYear"
@@ -62,6 +66,7 @@ const form = ref({
   weekStart: 1,
   monthFormat: 'YYYY-MM',
   dateFormat: 'DD',
+  needHoliday: true,
   needChinese: true
 })
 

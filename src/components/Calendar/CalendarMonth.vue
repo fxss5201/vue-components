@@ -14,7 +14,7 @@
         }"
       >
         <div class="calendar-month-cell-title">
-          <div class="calendar-month-cell-row" :title="date.date">{{ date.date }}</div>
+          <div class="calendar-month-cell-row font-16" :title="date.date">{{ date.date }}</div>
           <div
             v-if="props.needChinese"
             class="calendar-month-cell-row calendar-month-cell-chinese"
@@ -23,6 +23,7 @@
             {{ date.chinese }}
           </div>
         </div>
+        <div v-if="props.needHoliday && date.isWork !== undefined" class="calendar-month-cell-holiday" :class="{ 'text-red': date.isWork }">{{ date.isWork ? '班' : '休' }}</div>
       </div>
     </div>
   </div>
@@ -31,7 +32,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { ref, watch } from 'vue'
-import { Lunar, Solar } from 'lunar-typescript'
+import { Lunar, Solar, HolidayUtil } from 'lunar-typescript'
 
 interface Props {
   year: number
@@ -40,6 +41,7 @@ interface Props {
   weekStart?: number
   monthFormat?: string
   dateFormat?: string
+  needHoliday?: boolean
   needChinese?: boolean
 }
 
@@ -70,6 +72,7 @@ watch(
       weekStart: newValue.weekStart ?? defaultWeekStart,
       monthFormat: newValue.monthFormat || 'YYYY-MM',
       dateFormat: newValue.dateFormat || 'DD',
+      needHoliday: newValue.needHoliday || false,
       needChinese: newValue.needChinese || false
     })
 
@@ -95,6 +98,7 @@ interface OptionType {
   weekStart?: number
   monthFormat?: string
   dateFormat?: string
+  needHoliday?: boolean
   needChinese?: boolean
 }
 
@@ -104,6 +108,7 @@ interface DateType {
   isIn: boolean
   isNow: boolean
   chinese?: string
+  isWork?: boolean
   jie?: boolean
 }
 
@@ -126,6 +131,7 @@ function getMonthCalendar(year: number, month: number, option: OptionType = {}):
     weekStart: defaultWeekStart,
     monthFormat: 'YYYY-MM',
     dateFormat: 'DD',
+    needHoliday: false,
     needChinese: false,
     ...option
   }
@@ -166,17 +172,31 @@ function getMonthCalendar(year: number, month: number, option: OptionType = {}):
   for (let index = 0; index < cellDays; index++) {
     const curDate = dayjs(cellStart).add(index, 'day')
     const fullDate = curDate.format('YYYY-MM-DD')
+    let curDateObj: DateType = {
+      fullDate,
+      date: curDate.format(configOption.dateFormat),
+      isIn: preEndDate <= index && index < nextStartDate,
+      isNow: fullDate === nowDate.value.format('YYYY-MM-DD') && curDate.month() === month
+    }
+
+    if (configOption.needHoliday) {
+      const curHoliday = HolidayUtil.getHoliday(fullDate)
+      if (curHoliday) {
+        curDateObj = {
+          ...curDateObj,
+          isWork: curHoliday.isWork()
+        }
+      }
+    }
+    
     if (configOption.needChinese) {
       const lunarDate = Lunar.fromDate(curDate.toDate())
       const currentJieQi = lunarDate.getCurrentJieQi()
       const solarDate = Solar.fromDate(curDate.toDate())
       const lunarFestivals = lunarDate.getFestivals()
       const solarFestivals = solarDate.getFestivals()
-      monthChildren.push({
-        fullDate,
-        date: curDate.format(configOption.dateFormat),
-        isIn: preEndDate <= index && index < nextStartDate,
-        isNow: fullDate === nowDate.value.format('YYYY-MM-DD') && curDate.month() === month,
+      curDateObj = {
+        ...curDateObj,
         jie: lunarFestivals.length > 0 || solarFestivals.length > 0,
         chinese:
           lunarFestivals.length > 0
@@ -188,15 +208,9 @@ function getMonthCalendar(year: number, month: number, option: OptionType = {}):
                 : lunarDate.getDayInChinese() === '初一'
                   ? `${lunarDate.getMonthInChinese()}月`
                   : lunarDate.getDayInChinese()
-      })
-    } else {
-      monthChildren.push({
-        fullDate,
-        date: curDate.format(configOption.dateFormat),
-        isIn: preEndDate <= index && index < nextStartDate,
-        isNow: fullDate === nowDate.value.format('YYYY-MM-DD') && curDate.month() === month
-      })
+      }
     }
+    monthChildren.push(curDateObj)
   }
 
   return {
@@ -241,6 +255,7 @@ function getMonthCalendar(year: number, month: number, option: OptionType = {}):
     display: flex;
     justify-content: center;
     overflow: hidden;
+    position: relative;
 
     &.calendar-month-cell-not {
       color: #ccc;
@@ -268,6 +283,20 @@ function getMonthCalendar(year: number, month: number, option: OptionType = {}):
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .calendar-month-cell-holiday {
+    position: absolute;
+    top: 5px;
+    right: 4px;
+    z-index: 10;
+    font-size: 12px;
+    color: var(--el-color-primary);
+    &.text-red {
+      color: var(--el-color-error);
+    }
+  }
+  .font-16 {
+    font-size: 16px;
   }
 }
 </style>

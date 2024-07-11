@@ -18,6 +18,7 @@
         :week-start="props.weekStart"
         :month-format="props.monthFormat"
         :date-format="props.dateFormat"
+        :need-holiday="props.needHoliday"
         :need-chinese="props.needChinese"
       ></CalendarMonth>
     </div>
@@ -35,6 +36,7 @@ interface Props {
   weekStart?: number
   monthFormat?: string
   dateFormat?: string
+  needHoliday?: boolean
   needChinese?: boolean
 }
 
