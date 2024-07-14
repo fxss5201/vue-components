@@ -16,6 +16,14 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: '日历'
     }
+  },
+  {
+    path: '/httpCache',
+    name: 'httpCache',
+    component: () => import('../views/HttpCache/HttpCacheView.vue'),
+    meta: {
+      title: '接口缓存'
+    }
   }
 ]
 
