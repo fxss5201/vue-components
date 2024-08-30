@@ -24,6 +24,14 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: '接口缓存'
     }
+  },
+  {
+    path: '/tableRowSpan',
+    name: 'tableRowSpan',
+    component: () => import('../views/TableRowSpan.vue'),
+    meta: {
+      title: 'table 合并'
+    }
   }
 ]
 
