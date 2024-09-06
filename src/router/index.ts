@@ -32,6 +32,14 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: 'table 合并'
     }
+  },
+  {
+    path: '/videoView',
+    name: 'videoView',
+    component: () => import('../views/VideoView.vue'),
+    meta: {
+      title: '视频'
+    }
   }
 ]
 
