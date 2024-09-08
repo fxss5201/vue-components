@@ -1,15 +1,10 @@
 <template>
   <div>
-    <video
-      ref="videoRef"
-      crossorigin="anonymous"
-      controls
-      @click="playing = !playing"
-    ></video>
-    <button @click="playing = !playing">
-      Play / Pause
-    </button>
-    <pre style="background-color: darkturquoise;">{{ text }}</pre>
+    <video ref="videoRef" crossorigin="anonymous" controls @click="playing = !playing"></video>
+    <div style="margin: 10px 0">
+      <ElButton @click="playing = !playing">{{ playing ? '暂停' : '播放' }}</ElButton>
+    </div>
+    <pre style="background-color: darkturquoise">{{ text }}</pre>
   </div>
 </template>
 
@@ -22,13 +17,11 @@ const videoRef = ref<HTMLVideoElement>()
 const controls = useMediaControls(videoRef, {
   src: {
     src: videoSrc,
-    type: 'video/webm',
+    type: 'video/webm'
   }
 })
 
-const {
-  playing
-} = controls
+const { playing } = controls
 
 const text = reactive(controls)
 </script>

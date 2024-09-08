@@ -1,5 +1,5 @@
 <template>
-  <div class="page-box">
+  <div>
     <div class="mb-12">
       <el-button type="primary" @click="addEvent">新增</el-button>
       <el-button @click="getStudentList">刷新</el-button>
@@ -78,11 +78,7 @@ function dialogConfirmFn() {
 </script>
 
 <style lang="scss" scoped>
-.page-box {
-  padding: 12px;
-
-  .mb-12 {
-    margin-bottom: 12px;
-  }
+.mb-12 {
+  margin-bottom: 12px;
 }
 </style>

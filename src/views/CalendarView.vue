@@ -95,7 +95,6 @@ function toNowYear() {
 
 <style lang="scss" scoped>
 .calendar-view-box {
-  padding: 12px;
   display: flex;
   align-items: flex-start;
   .form-box {

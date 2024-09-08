@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
+import { House, Calendar, Coin, VideoPlay } from '@element-plus/icons-vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -6,7 +7,8 @@ export const routes: RouteRecordRaw[] = [
     name: 'home',
     component: () => import('../views/HomeView.vue'),
     meta: {
-      title: '首页'
+      title: '首页',
+      icon: <House />
     }
   },
   {
@@ -14,7 +16,8 @@ export const routes: RouteRecordRaw[] = [
     name: 'calendar',
     component: () => import('../views/CalendarView.vue'),
     meta: {
-      title: '日历'
+      title: '日历',
+      icon: <Calendar />
     }
   },
   {
@@ -22,7 +25,8 @@ export const routes: RouteRecordRaw[] = [
     name: 'httpCache',
     component: () => import('../views/HttpCache/HttpCacheView.vue'),
     meta: {
-      title: '接口缓存'
+      title: '接口缓存',
+      icon: <Coin />
     }
   },
   {
@@ -30,7 +34,8 @@ export const routes: RouteRecordRaw[] = [
     name: 'tableRowSpan',
     component: () => import('../views/TableRowSpan.vue'),
     meta: {
-      title: 'table 合并'
+      title: 'table 合并',
+      iconfont: 'icon-table'
     }
   },
   {
@@ -38,7 +43,8 @@ export const routes: RouteRecordRaw[] = [
     name: 'videoView',
     component: () => import('../views/VideoView.vue'),
     meta: {
-      title: '视频'
+      title: '视频',
+      icon: <VideoPlay />
     }
   }
 ]
