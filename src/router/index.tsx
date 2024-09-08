@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
-import { House, Calendar, Coin, VideoPlay } from '@element-plus/icons-vue'
+import { House, Calendar, Coin, VideoPlay, Edit } from '@element-plus/icons-vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -45,6 +45,15 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: '视频',
       icon: <VideoPlay />
+    }
+  },
+  {
+    path: '/contenteditableView',
+    name: 'contenteditableView',
+    component: () => import('../views/ContenteditableView.vue'),
+    meta: {
+      title: '编辑输入框',
+      icon: <Edit />
     }
   }
 ]

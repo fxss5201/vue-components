@@ -3,12 +3,18 @@
     <div class="layout-head">
       <div class="layout-head-left">
         <div class="layout-title">vue-components</div>
-        <el-button text @click="menuCollapseStore.toggleMenuCollapse">
-          <el-icon size="18">
-            <Expand v-if="menuCollapse" />
-            <Fold v-else />
-          </el-icon>
-        </el-button>
+        <el-tooltip
+          effect="light"
+          :content="menuCollapse ? '展开菜单' : '收起菜单'"
+          placement="bottom-start"
+        >
+          <el-button text @click="menuCollapseStore.toggleMenuCollapse">
+            <el-icon size="18">
+              <Expand v-if="menuCollapse" />
+              <Fold v-else />
+            </el-icon>
+          </el-button>
+        </el-tooltip>
       </div>
       <div class="layout-head-right">
         <el-link
