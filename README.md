@@ -2,6 +2,13 @@
 
 [国内展示网址](https://www.fxss.work/vue-components/)
 
+其他网址：
+
+- 低代码：<https://www.fxss.work/>
+- 算法：<https://www.fxss.work/fxss-leetcode/>
+- 个人博客：<https://blog.fxss.work/>
+- web库：<https://www.fxss.work/webLibraries/>
+
 This template should help get you started developing with Vue 3 in Vite.
 
 ## Recommended IDE Setup
