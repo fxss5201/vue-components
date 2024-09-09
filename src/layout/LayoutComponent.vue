@@ -32,7 +32,10 @@
       <div class="layout-saide">
         <AsideComponent></AsideComponent>
       </div>
-      <div class="layout-main">
+      <div
+        class="layout-main"
+        :style="{ backgroundColor: (route.meta?.backgroundColor as string) ?? '#fff' }"
+      >
         <Suspense>
           <RouterView />
           <template #fallback> Loading... </template>
@@ -43,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import { Fold, Expand } from '@element-plus/icons-vue'
 import AsideComponent from '@/layout/AsideComponent.vue'
 import IconSvg from '@/components/IconSvg.vue'
@@ -52,6 +55,7 @@ import { storeToRefs } from 'pinia'
 
 const menuCollapseStore = useMenuCollapseStore()
 const { menuCollapse } = storeToRefs(menuCollapseStore)
+const route = useRoute()
 </script>
 
 <style scoped lang="scss">

@@ -10,7 +10,14 @@
           </el-button>
         </el-tooltip>
       </div>
-      <div class="editor-box" contenteditable></div>
+      <div
+        class="editor-box"
+        ref="editorRef"
+        contenteditable="true"
+        v-html="editorInnerHtml"
+        @input="editorInput"
+        @keydown.alt="keyupFn"
+      ></div>
       <div class="editor-button">
         <el-button type="primary">发送</el-button>
       </div>
@@ -19,12 +26,33 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'
 import { Crop } from '@element-plus/icons-vue'
 import ScreenShot from 'js-web-screen-shot'
 
+const editorInnerHtml = ref('')
+const editorRef = ref<HTMLInputElement>()
+const editorImgs = ref<string[]>([])
+const editorInput = (e: Event) => {
+  editorInnerHtml.value = (e?.target as HTMLInputElement).innerHTML
+}
+const keyupFn = (e: KeyboardEvent) => {
+  if (e.key === 'x') {
+    doScreenEvent()
+  }
+}
+
 const doScreenEvent = () => {
   new ScreenShot({
-    enableWebRtc: true
+    enableWebRtc: true,
+    level: 99999,
+    clickCutFullScreen: true,
+    wrcReplyTime: 500,
+    wrcWindowMode: true,
+    completeCallback: ({ base64 }) => {
+      editorImgs.value.push(base64)
+      editorInnerHtml.value = editorInnerHtml.value + `<img src="${base64}">`
+    }
   })
 }
 </script>
@@ -62,6 +90,13 @@ const doScreenEvent = () => {
     .editor-button {
       text-align: right;
     }
+  }
+}
+</style>
+<style lang="scss">
+.editor-box {
+  img {
+    width: 160px;
   }
 }
 </style>

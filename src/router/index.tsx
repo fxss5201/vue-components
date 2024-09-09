@@ -53,7 +53,8 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../views/ContenteditableView.vue'),
     meta: {
       title: '编辑输入框',
-      icon: <Edit />
+      icon: <Edit />,
+      backgroundColor: '#f9f9f9'
     }
   }
 ]
