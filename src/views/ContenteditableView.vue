@@ -13,7 +13,12 @@
               </el-button>
             </el-tooltip>
           </div>
-          <div class="editor-box" ref="editorRef" contenteditable="true" @keydown.alt="keyupFn"></div>
+          <div
+            class="editor-box"
+            ref="editorRef"
+            contenteditable="true"
+            @keydown.alt="keyupFn"
+          ></div>
           <div class="editor-button">
             <el-button type="primary" @click="setClipboardFn">设置剪贴板内容</el-button>
             <el-button type="primary" @click="getClipboardFn">获取剪贴板内容</el-button>
@@ -59,9 +64,9 @@ const doScreenEvent = () => {
   })
 }
 
-async function getClipboardFn () {
+async function getClipboardFn() {
   const contents = await getClipboardContents()
-  contents?.forEach(async item => {
+  contents?.forEach(async (item) => {
     if (item.type === 'text/plain') {
       // const reader = new FileReader()
       // reader.readAsText(item.blob)
@@ -92,9 +97,8 @@ async function getClipboardFn () {
 }
 
 async function setClipboardFn() {
-  copyImageToClipboard('https://blog.fxss.work/logo.png')
-  // TODO: jpg图片转png
-  // copyImageToClipboard('https://blog.fxss.work/hero-197a9d2d.jpg')
+  // copyImageToClipboard('https://blog.fxss.work/logo.png')
+  copyImageToClipboard('https://blog.fxss.work/hero-197a9d2d.jpg')
 }
 </script>
 
