@@ -15,6 +15,8 @@
           </div>
           <div class="editor-box" ref="editorRef" contenteditable="true" @keydown.alt="keyupFn"></div>
           <div class="editor-button">
+            <el-button type="primary" @click="setClipboardFn">设置剪贴板内容</el-button>
+            <el-button type="primary" @click="getClipboardFn">获取剪贴板内容</el-button>
             <el-button type="primary">发送</el-button>
           </div>
         </div>
@@ -29,6 +31,7 @@ import { Crop } from '@element-plus/icons-vue'
 import ScreenShot from 'js-web-screen-shot'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
+import { copyImageToClipboard, getClipboardContents } from '@/utils/clipboard'
 
 const editorRef = ref<HTMLInputElement>()
 const editorImgs = ref<string[]>([])
@@ -54,6 +57,42 @@ const doScreenEvent = () => {
       range?.collapseToEnd()
     }
   })
+}
+
+async function getClipboardFn () {
+  const contents = await getClipboardContents()
+  contents?.forEach(item => {
+    const reader = new FileReader()
+    if (item.type === 'text/plain') {
+      reader.readAsText(item.blob)
+      reader.addEventListener(
+        'load',
+        () => {
+          console.log(reader.result)
+        },
+        false,
+      )
+    } else {
+      const url = URL.createObjectURL(item.blob)
+      const aLink = document.createElement('a')
+      aLink.href = url
+      let type = ''
+      if (item.type === 'text/html') {
+        type = 'html'
+      } else if (item.type === 'image/png') {
+        type = 'png'
+      }
+      aLink.download = `${new Date().getTime()}.${type}`
+      aLink.dispatchEvent(new MouseEvent('click'))
+      URL.revokeObjectURL(url)
+    }
+  })
+}
+
+async function setClipboardFn() {
+  copyImageToClipboard('https://blog.fxss.work/logo.png')
+  // TODO: jpg图片转png
+  // copyImageToClipboard('https://blog.fxss.work/hero-197a9d2d.jpg')
 }
 </script>
 
