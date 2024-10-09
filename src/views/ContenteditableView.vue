@@ -61,17 +61,19 @@ const doScreenEvent = () => {
 
 async function getClipboardFn () {
   const contents = await getClipboardContents()
-  contents?.forEach(item => {
-    const reader = new FileReader()
+  contents?.forEach(async item => {
     if (item.type === 'text/plain') {
-      reader.readAsText(item.blob)
-      reader.addEventListener(
-        'load',
-        () => {
-          console.log(reader.result)
-        },
-        false,
-      )
+      // const reader = new FileReader()
+      // reader.readAsText(item.blob)
+      // reader.addEventListener(
+      //   'load',
+      //   () => {
+      //     console.log(reader.result)
+      //   },
+      //   false,
+      // )
+      const text = await item.blob.text()
+      console.log(text)
     } else {
       const url = URL.createObjectURL(item.blob)
       const aLink = document.createElement('a')
