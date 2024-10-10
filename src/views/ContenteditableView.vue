@@ -97,8 +97,8 @@ async function getClipboardFn() {
 }
 
 async function setClipboardFn() {
-  // copyImageToClipboard('https://blog.fxss.work/logo.png')
-  copyImageToClipboard('https://blog.fxss.work/hero-197a9d2d.jpg')
+  copyImageToClipboard('https://blog.fxss.work/logo.png')
+  // copyImageToClipboard('https://blog.fxss.work/hero-197a9d2d.jpg')
 }
 </script>
 
