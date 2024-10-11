@@ -3,9 +3,7 @@
     ref="resizeCard"
     :style="{
       width: resizeCardWidth + 'px',
-      height: resizeCardHeight + 'px',
-      minWidth: props.minWidth + 'px',
-      minHeight: props.minHeight + 'px'
+      height: resizeCardHeight + 'px'
     }">
     <slot />
     <div class="resize-card__resize" v-if="props.resize" ref="handleResizeEl">
