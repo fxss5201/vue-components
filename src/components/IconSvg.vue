@@ -8,7 +8,7 @@
 const props = withDefaults(
   defineProps<{
     icon: string
-    size: string
+    size?: string
   }>(),
   {
     size: '14px'

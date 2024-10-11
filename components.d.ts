@@ -33,6 +33,7 @@ declare module 'vue' {
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconSvg: typeof import('./src/components/IconSvg.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
+    ResizeCard: typeof import('./src/components/ResizeCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
