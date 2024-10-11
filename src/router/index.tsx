@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
-import { House, Calendar, Coin, VideoPlay, Edit } from '@element-plus/icons-vue'
+import { House, Calendar, Coin, VideoPlay, Edit, ChatLineSquare } from '@element-plus/icons-vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -55,6 +55,15 @@ export const routes: RouteRecordRaw[] = [
       title: '编辑输入框',
       icon: <Edit />,
       backgroundColor: '#f9f9f9'
+    }
+  },
+  {
+    path: '/tooltip',
+    name: 'tooltip',
+    component: () => import('../views/TooltipView.vue'),
+    meta: {
+      title: '是否需要提示',
+      icon: <ChatLineSquare />
     }
   }
 ]
