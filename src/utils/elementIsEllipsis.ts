@@ -7,7 +7,7 @@ import { getLayoutPadding } from "./getLayout"
  * @param {HTMLElement} element - 要检查的 HTMLElement。
  * @returns {boolean} 如果需要省略号则返回 true，否则返回 false。
  */
-export function elementEllipsis(element: HTMLElement) {
+export function elementIsEllipsis(element: HTMLElement): boolean {
   const range = document.createRange()
   range.setStart(element, 0)
   range.setEnd(element, element.childNodes.length)

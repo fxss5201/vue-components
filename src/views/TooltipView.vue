@@ -1,6 +1,37 @@
 <template>
-  <ResizeCard class="resize-box" @reisze="handleResize">
+  <ResizeCard class="resize-box" :default-height="250">
     <div class="list-box">
+      <div class="list-item" v-for="item in list" :key="item.id">
+        <div class="item-left">
+          <el-tooltip
+            effect="dark"
+            :content="item.title"
+            placement="top-start"
+            :disabled="tooltipDisabled"
+          >
+            <div class="item-title" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
+              {{ item.title }}
+            </div>
+          </el-tooltip>
+          <el-tooltip
+            effect="dark"
+            :content="item.content"
+            placement="top-start"
+            :disabled="tooltipDisabled"
+          >
+            <div class="item-content" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
+              {{ item.content }}
+            </div>
+          </el-tooltip>
+        </div>
+        <div class="item-right">
+          <div class="item-tag">{{ item.tag }}</div>
+        </div>
+      </div>
+    </div>
+  </ResizeCard>
+  <ResizeCard class="resize-box" @reisze="handleResize" :autoWatchScroll="false" :is-scroll="resizeCardIsScroll" style="margin-top: 16px;">
+    <div class="list-box" ref="listBox" style="height: 100%;overflow-y: auto;">
       <div class="list-item" v-for="item in list" :key="item.id">
         <div class="item-left">
           <el-tooltip
@@ -34,9 +65,9 @@
 
 <script lang="ts" setup>
 import ResizeCard from '@/components/ResizeCard.vue'
-import { ref } from 'vue'
-import { elementEllipsis } from '@/utils/elementEllipsis'
-import { getScrollbarWidth } from '@/utils/getLayout'
+import { nextTick, onMounted, ref } from 'vue'
+import { elementIsEllipsis } from '@/utils/elementIsEllipsis'
+import { elementIsScrollY } from '@/utils/elementIsScroll'
 
 const list = ref([
   {
@@ -61,17 +92,24 @@ const list = ref([
 ])
 const tooltipDisabled = ref(true)
 function mouseenterFn (e: MouseEvent) {
-  console.log(getScrollbarWidth())
   const curDiv = e.target as HTMLElement
-  tooltipDisabled.value = !elementEllipsis(curDiv)
+  tooltipDisabled.value = !elementIsEllipsis(curDiv)
 }
 function mouseleaveFn() {
   tooltipDisabled.value = false
 }
 
+const resizeCardIsScroll = ref(false)
+const listBox = ref<HTMLDivElement>()
 function handleResize(value: { width: number; height: number }) {
   console.log(value)
+  resizeCardIsScroll.value = elementIsScrollY(listBox.value as HTMLDivElement)
 }
+onMounted(() => {
+  nextTick(() => {
+    resizeCardIsScroll.value = elementIsScrollY(listBox.value as HTMLDivElement)
+  })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -80,8 +118,6 @@ function handleResize(value: { width: number; height: number }) {
 }
 .list-box {
   padding: 16px;
-  height: 100%;
-  overflow-y: auto;
   .list-item {
     background-color: #e8effa;
     padding: 8px 12px;
