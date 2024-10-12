@@ -9,7 +9,9 @@
             placement="top-start"
             :disabled="tooltipDisabled"
           >
-            <div class="item-title" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">{{ item.title }}</div>
+            <div class="item-title" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
+              {{ item.title }}
+            </div>
           </el-tooltip>
           <el-tooltip
             effect="dark"
@@ -17,7 +19,9 @@
             placement="top-start"
             :disabled="tooltipDisabled"
           >
-            <div class="item-content" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">{{ item.content }}</div>
+            <div class="item-content" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
+              {{ item.content }}
+            </div>
           </el-tooltip>
         </div>
         <div class="item-right">
@@ -44,7 +48,8 @@ const list = ref([
   {
     id: 2,
     title: '这是测试标题2这是测试标题2这是测试标题2这是测试标题2',
-    content: '这是测试内容2这是测试内容2这是测试内容2这是测试内容2这是测试内容2这是测试内容2这是测试内容2',
+    content:
+      '这是测试内容2这是测试内容2这是测试内容2这是测试内容2这是测试内容2这是测试内容2这是测试内容2',
     tag: 'bbb'
   },
   {
@@ -57,15 +62,14 @@ const list = ref([
 const tooltipDisabled = ref(true)
 function mouseenterFn (e: MouseEvent) {
   console.log(getScrollbarWidth())
-
   const curDiv = e.target as HTMLElement
   tooltipDisabled.value = !elementEllipsis(curDiv)
 }
-function mouseleaveFn () {
+function mouseleaveFn() {
   tooltipDisabled.value = false
 }
 
-function handleResize (value: { width: number; height: number }) {
+function handleResize(value: { width: number; height: number }) {
   console.log(value)
 }
 </script>
@@ -76,6 +80,8 @@ function handleResize (value: { width: number; height: number }) {
 }
 .list-box {
   padding: 16px;
+  height: 100%;
+  overflow-y: auto;
   .list-item {
     background-color: #e8effa;
     padding: 8px 12px;
@@ -83,17 +89,27 @@ function handleResize (value: { width: number; height: number }) {
     align-items: center;
     justify-content: space-between;
     border-radius: 4px;
-   .item-left {
+    &:nth-child(2) {
+      .item-left {
+        .item-title {
+          padding: 0 12px;
+        }
+        .item-content {
+          padding: 0 24px;
+        }
+      }
+    }
+    .item-left {
       flex: auto;
       overflow: hidden;
-     .item-title {
+      .item-title {
         font-size: 16px;
         color: #333;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-     .item-content {
+      .item-content {
         font-size: 14px;
         color: #666;
         margin-top: 4px;
