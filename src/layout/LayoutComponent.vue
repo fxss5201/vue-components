@@ -36,26 +36,47 @@
         class="layout-main"
         :style="{ backgroundColor: (route.meta?.backgroundColor as string) ?? '#fff' }"
       >
-        <Suspense>
-          <RouterView />
-          <template #fallback> Loading... </template>
-        </Suspense>
+        <RouterView v-slot="{ Component }">
+          <template v-if="Component">
+            <Suspense>
+              <component :is="Component"></component>
+
+              <template #fallback>
+                正在加载...
+              </template>
+            </Suspense>
+          </template>
+        </RouterView>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterView, useRoute } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import { Fold, Expand } from '@element-plus/icons-vue'
 import AsideComponent from '@/layout/AsideComponent.vue'
 import IconSvg from '@/components/IconSvg.vue'
 import { useMenuCollapseStore } from '@/stores/menuCollapse'
 import { storeToRefs } from 'pinia'
+import { useNProgress } from '@vueuse/integrations/useNProgress'
+import 'nprogress/nprogress.css'
 
 const menuCollapseStore = useMenuCollapseStore()
 const { menuCollapse } = storeToRefs(menuCollapseStore)
 const route = useRoute()
+const router = useRouter()
+
+const { start: startNProgress, done: doneNProgress } = useNProgress()
+
+router.beforeEach((to, from, next) => {
+  startNProgress()
+  next()
+})
+router.afterEach((to, from) => {
+  document.title = `${to.meta.title as string} | vue-components`
+  doneNProgress()
+})
 </script>
 
 <style scoped lang="scss">

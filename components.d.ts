@@ -30,5 +30,6 @@ declare module 'vue' {
     ResizeCard: typeof import('./src/components/ResizeCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SimpleSwiper: typeof import('./src/components/SimpleSwiper.vue')['default']
   }
 }

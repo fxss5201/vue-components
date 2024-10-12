@@ -16,6 +16,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "@vueuse/core": "^11.0.3",
+    "@vueuse/integrations": "^11.1.0",
     "axios": "^1.7.2",
     "conversion-library": "^0.0.7",
     "dayjs": "^1.11.11",
@@ -24,6 +25,7 @@
     "js-web-screen-shot": "^1.9.9-rc.20",
     "lunar-typescript": "^1.7.5",
     "mockjs": "^1.1.0",
+    "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
     "splitpanes": "^3.1.5",
     "vue": "^3.4.29",
