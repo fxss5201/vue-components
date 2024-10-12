@@ -32,6 +32,7 @@
 import ResizeCard from '@/components/ResizeCard.vue'
 import { ref } from 'vue'
 import { elementEllipsis } from '@/utils/elementEllipsis'
+import { getScrollbarWidth } from '@/utils/getLayout'
 
 const list = ref([
   {
@@ -55,6 +56,8 @@ const list = ref([
 ])
 const tooltipDisabled = ref(true)
 function mouseenterFn (e: MouseEvent) {
+  console.log(getScrollbarWidth())
+
   const curDiv = e.target as HTMLElement
   tooltipDisabled.value = !elementEllipsis(curDiv)
 }
