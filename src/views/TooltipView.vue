@@ -113,9 +113,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.resize-box {
-  border: 1px solid var(--el-menu-border-color);
-}
 .list-box {
   padding: 16px;
   .list-item {

@@ -165,6 +165,7 @@ watch(
 .resize-card {
   position: relative;
   overflow: hidden auto;
+  border: 1px solid var(--el-menu-border-color);
   .resize-card__resize {
     position: absolute;
     bottom: 2px;

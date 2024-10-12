@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
-import { House, Calendar, Coin, VideoPlay, Edit, ChatLineSquare } from '@element-plus/icons-vue'
+import { House, Calendar, Coin, VideoPlay, Edit, ChatLineSquare, ScaleToOriginal } from '@element-plus/icons-vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -64,6 +64,15 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: '是否需要提示',
       icon: <ChatLineSquare />
+    }
+  },
+  {
+    path: '/simpleSwiper',
+    name: 'simpleSwiper',
+    component: () => import('../views/SimpleSwiperView.vue'),
+    meta: {
+      title: '简单swiper',
+      icon: <ScaleToOriginal />
     }
   }
 ]
