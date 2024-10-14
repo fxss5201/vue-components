@@ -20,6 +20,7 @@
     "axios": "^1.7.2",
     "conversion-library": "^0.0.7",
     "dayjs": "^1.11.11",
+    "echarts": "^5.5.1",
     "element-plus": "^2.7.6",
     "f-cache-memory": "^0.0.8",
     "js-web-screen-shot": "^1.9.9-rc.20",
