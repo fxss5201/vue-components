@@ -4,7 +4,7 @@
       <el-icon :size="16"><ArrowLeftBold /></el-icon>
     </div>
     <div class="simple-swiper-wrapper" ref="simpleSwiperWeapper">
-      <div class="simple-swiper-content" ref="simpleSwiperContent">
+      <div class="simple-swiper-content" ref="simpleSwiperContent" :style="{ transitionDuration: `${singleChangeDuration}s` }">
         <slot></slot>
       </div>
     </div>
@@ -16,16 +16,19 @@
 
 <script lang="ts" setup>
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue'
-import { nextTick, ref, onMounted } from 'vue'
+import { nextTick, ref, onMounted, watch } from 'vue'
 import { useDebounceFn, useResizeObserver } from '@vueuse/core'
 
 const props = withDefaults(
   defineProps<{
     itemWidth?: number
+    itemDuration?: number
     length?: number
   }>(),
   {
     itemWidth: 100,
+    // 单个子项目滚动的耗时，单位ms
+    itemDuration: 180,
     length: 10
   }
 )
@@ -35,6 +38,7 @@ const simpleSwiperWeapper = ref<HTMLDivElement>()
 const simpleSwiperContent = ref<HTMLDivElement>()
 const isHadButton = ref(false)
 const singleChangeWidth = ref(0)
+const singleChangeDuration = ref(0)
 const maxCanChangeNum = ref(0)
 const nowChangeNum = ref(0)
 
@@ -44,6 +48,13 @@ const debouncedFn = useDebounceFn(() => {
 useResizeObserver(simpleSwiper, () => {
   debouncedFn()
 })
+
+watch(
+  () => [props.length, props.itemWidth, props.itemDuration], 
+  () => {
+    doCreateSwiper()
+  }
+)
 
 onMounted(() => {
   doCreateSwiper()
@@ -62,6 +73,7 @@ function createSwiper () {
     simpleSwiperContent.value.style.marginLeft = '0px'
     const num = Math.floor(simpleSwiperWeapperWidth / props.itemWidth)
     singleChangeWidth.value = num * props.itemWidth
+    singleChangeDuration.value = num * props.itemDuration / 1000
     maxCanChangeNum.value = Math.ceil(props.length / num)
     nowChangeNum.value = maxCanChangeNum.value
     let isHadButtonCur = false
