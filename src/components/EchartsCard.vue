@@ -75,22 +75,22 @@ function destroyEchart () {
 
 function updateEchart () {
   nextTick(() => {
-    echartsInstance.value && echartsInstance.value.setOption(props.options, true)
+    echartsInstance.value?.setOption(props.options, true)
   })
 }
 
 function resizeEchart () {
-  echartsInstance.value && echartsInstance.value.resize()
+  echartsInstance.value?.resize()
 }
 
 function addClickEventFn () {
-  echartsInstance.value && echartsInstance.value.on('click', (event) => {
+  echartsInstance.value?.on('click', (event) => {
     console.log('event', event)
     emit('click', event)
   })
 }
 
 function removeClickEventFn () {
-  echartsInstance.value && echartsInstance.value.off('click')
+  echartsInstance.value?.off('click')
 }
 </script>

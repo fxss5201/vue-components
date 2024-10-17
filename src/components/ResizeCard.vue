@@ -81,9 +81,7 @@ let resizeCardWidth = ref(props.defaultWidth)
 let resizeCardHeight = ref(props.defaultHeight)
 
 function resizeFn (e: MouseEvent) {
-  if (resizeCard.value) {
-    resizeCard.value.style.userSelect = 'none'
-  }
+  resizeCard.value!.style.userSelect = 'none'
   isResizing.value = true
   let startX = e.clientX
   let startY = e.clientY
@@ -129,9 +127,7 @@ function resizeFn (e: MouseEvent) {
 }
 function mouseupFn () {
   isResizing.value = false
-  if (resizeCard.value) {
-    resizeCard.value.style.userSelect = ''
-  }
+  resizeCard.value!.style.userSelect = ''
   emit('reisze', {
     width: resizeCardWidth.value,
     height: resizeCardHeight.value
