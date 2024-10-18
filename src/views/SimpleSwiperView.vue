@@ -1,4 +1,5 @@
 <template>
+  <MarkdownCard :content="SimpleSwiperMd" />
   <ResizeCard>
     <div style="padding: 16px;">
       <el-form :model="form" label-width="auto" style="margin-bottom: 12px;">
@@ -45,7 +46,10 @@
         :bullets-number="form.bulletsNumber"
         :bullets-tooltip="form.bulletsTooltip"
         @change="simpleSwiperChange">
-        <div class="simple-swiper-item" v-for="item in list" :key="item" :style="{ flex: `0 0 ${form.itemWidth}px`, width: `${form.itemWidth}px`, height: `${form.itemWidth}px` }">
+        <div class="simple-swiper-item"
+          v-for="item in list"
+          :key="item"
+          :style="{ flex: `0 0 ${form.itemWidth}px`, width: `${form.itemWidth}px`, height: `${form.itemWidth}px` }">
           <div class="item-title">{{ item }}</div>
         </div>
       </SimpleSwiper>
@@ -56,7 +60,9 @@
 <script lang="ts" setup>
 import ResizeCard from '@/components/ResizeCard.vue'
 import SimpleSwiper from '@/components/SimpleSwiper.vue'
-import { ref } from 'vue';
+import { ref } from 'vue'
+import MarkdownCard from '@/components/MarkdownCard.vue'
+import SimpleSwiperMd from '@/md/SimpleSwiper.md?raw'
 
 type switchingMethodType = 'prevNextButton' | 'pagination' | 'bullets'
 const list = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])

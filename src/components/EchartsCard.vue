@@ -85,7 +85,7 @@ function resizeEchart () {
 
 function addClickEventFn () {
   echartsInstance.value?.on('click', (event) => {
-    console.log('event', event)
+    if (import.meta.env.DEV) console.log('event', event)
     emit('click', event)
   })
 }

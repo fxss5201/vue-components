@@ -30,6 +30,7 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     IconSvg: typeof import('./src/components/IconSvg.vue')['default']
+    MarkdownCard: typeof import('./src/components/MarkdownCard.vue')['default']
     ResizeCard: typeof import('./src/components/ResizeCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

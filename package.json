@@ -25,6 +25,7 @@
     "f-cache-memory": "^0.0.8",
     "js-web-screen-shot": "^1.9.9-rc.20",
     "lunar-typescript": "^1.7.5",
+    "markdown-it": "^14.1.0",
     "mockjs": "^1.1.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
@@ -34,8 +35,10 @@
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",
+    "@shikijs/markdown-it": "^1.22.0",
     "@tsconfig/node20": "^20.1.4",
     "@types/jsdom": "^21.1.7",
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^20.14.5",
     "@types/splitpanes": "^2.2.6",
     "@vitejs/plugin-vue": "^5.0.5",
