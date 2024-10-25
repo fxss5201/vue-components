@@ -139,36 +139,37 @@ async function setClipboardFn() {
 </style>
 <style lang="scss">
 .splitpanes {
-  &__pane {
+  .splitpanes__pane {
+    display: flex;
     justify-content: center;
     align-items: center;
-    display: flex;
   }
 
-  &__splitter {
+  .splitpanes__splitter {
     background-color: var(--el-menu-border-color);
     position: relative;
   }
-
-  &__splitter:before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    transition: 0.4s;
+  &.splitpanes--vertical {
+    .splitpanes__splitter {
+      width: 1px;
+      padding: 0 1px;
+      &:before {
+        width: 3px;
+      }
+    }
   }
-  &--vertical > &__splitter:before {
-    left: -4px;
-    right: -4px;
+  &.splitpanes--horizontal {
+    .splitpanes__splitter {
+      height: 1px;
+      padding: 1px 0;
+      &:hover {
+        height: 3px;
+      }
+    }
   }
-  &--horizontal > &__splitter:before {
-    top: -4px;
-    bottom: -4px;
-  }
-  &__splitter:hover:before {
-    background-color: rgba(220, 223, 230, 0.3);
+  .splitpanes__splitter:hover {
+    background-color: blue;
+    padding: 0;
   }
 }
 .editor-box {
