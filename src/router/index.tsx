@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
-import { House, Calendar, Coin, VideoPlay, Edit, ChatLineSquare, ScaleToOriginal, DataLine } from '@element-plus/icons-vue'
+import { House, Calendar, Coin, VideoPlay, Edit, ChatLineSquare, ScaleToOriginal, DataLine, BottomRight } from '@element-plus/icons-vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -55,6 +55,15 @@ export const routes: RouteRecordRaw[] = [
       title: '编辑输入框',
       icon: <Edit />,
       backgroundColor: '#f9f9f9'
+    }
+  },
+  {
+    path: '/resizeCardView',
+    name: 'resizeCardView',
+    component: () => import('../views/ResizeCardView.vue'),
+    meta: {
+      title: '拖拽改变大小',
+      icon: <BottomRight />
     }
   },
   {

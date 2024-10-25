@@ -25,3 +25,5 @@
 | 事件名 | 说明 | 回调参数 |
 | --- | --- | --- |
 | change | 切换时触发 | `(curNum: number, allNum: number) => void` |
+
+## 例子

@@ -1,4 +1,5 @@
 <template>
+  <MarkdownCard :content="TooltipViewMd" />
   <ResizeCard class="resize-box" :default-height="250">
     <div class="list-box">
       <div class="list-item" v-for="item in list" :key="item.id">
@@ -30,7 +31,7 @@
       </div>
     </div>
   </ResizeCard>
-  <ResizeCard class="resize-box" @reisze="handleResize" :autoWatchScroll="false" :is-scroll="resizeCardIsScroll" style="margin-top: 16px;">
+  <ResizeCard class="resize-box" @resize="handleResize" :autoWatchScroll="false" :is-scroll="resizeCardIsScroll" style="margin-top: 16px;">
     <div class="list-box" ref="listBox" style="height: 100%;overflow-y: auto;">
       <div class="list-item" v-for="item in list" :key="item.id">
         <div class="item-left">
@@ -68,6 +69,8 @@ import ResizeCard from '@/components/ResizeCard.vue'
 import { nextTick, onMounted, ref } from 'vue'
 import { elementIsEllipsis } from '@/utils/elementIsEllipsis'
 import { elementIsScrollY } from '@/utils/elementIsScroll'
+import MarkdownCard from '@/components/MarkdownCard.vue'
+import TooltipViewMd from '@/md/TooltipView.md?raw'
 
 const list = ref([
   {

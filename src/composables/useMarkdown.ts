@@ -1,14 +1,7 @@
 import { computed } from 'vue'
 import MarkdownIt from 'markdown-it'
-import Shiki from '@shikijs/markdown-it'
 
 const md = new MarkdownIt()
-md.use(await Shiki({
-  themes: {
-    light: 'vitesse-light',
-    dark: 'vitesse-dark',
-  }
-}))
 
 const tableStylePlugin = () => {
   md.renderer.rules.table_open = function() {

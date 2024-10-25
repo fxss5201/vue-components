@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",
-    "@shikijs/markdown-it": "^1.22.0",
     "@tsconfig/node20": "^20.1.4",
     "@types/jsdom": "^21.1.7",
     "@types/markdown-it": "^14.1.2",
