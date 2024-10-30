@@ -31,8 +31,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { elTableRowSpan } from 'conversion-library'
+import { elTableRowSpan, changeCase } from 'conversion-library'
 import type { TableColumnCtx } from 'element-plus'
+
+console.log(changeCase.camelCase('test-table-row-span'))
 
 interface rowType {
   id: string
