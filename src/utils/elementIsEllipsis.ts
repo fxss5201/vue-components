@@ -1,4 +1,4 @@
-import { getLayoutPadding } from "./getLayout"
+import { getElementPadding } from 'expand-element'
 
 /**
  * 检查指定的 HTMLElement 是否需要省略号来显示其内容。
@@ -21,7 +21,7 @@ export function elementIsEllipsis(element: HTMLElement): boolean {
     rangeHeight = Math.floor(rangeHeight)
   }
   const { width: elementWidth, height: elementHeight } = element.getBoundingClientRect()
-  const { top, left, right, bottom } = getLayoutPadding(element)
+  const { top, left, right, bottom } = getElementPadding(element)
   const horizontalPadding = left + right
   const verticalPadding = top + bottom
   if (
