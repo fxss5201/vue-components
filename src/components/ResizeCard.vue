@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 import { nextTick, watch, ref } from 'vue'
-import { getScrollbarWidth } from '@/utils/getScrollbarWidth'
+import { getScrollbarWidth } from 'expand-element' 
 
 const props = withDefaults(
   defineProps<{

@@ -67,8 +67,7 @@
 <script lang="ts" setup>
 import ResizeCard from '@/components/ResizeCard.vue'
 import { nextTick, onMounted, ref } from 'vue'
-import { elementIsEllipsis } from '@/utils/elementIsEllipsis'
-import { elementIsScrollY } from '@/utils/elementIsScroll'
+import { getIsEllipsis, getIsScrollY } from 'expand-element'
 import MarkdownCard from '@/components/MarkdownCard.vue'
 import TooltipViewMd from '@/md/TooltipView.md?raw'
 
@@ -96,7 +95,7 @@ const list = ref([
 const tooltipDisabled = ref(true)
 function mouseenterFn (e: MouseEvent) {
   const curDiv = e.target as HTMLElement
-  tooltipDisabled.value = !elementIsEllipsis(curDiv)
+  tooltipDisabled.value = !getIsEllipsis(curDiv)
 }
 function mouseleaveFn() {
   tooltipDisabled.value = false
@@ -106,11 +105,11 @@ const resizeCardIsScroll = ref(false)
 const listBox = ref<HTMLDivElement>()
 function handleResize(value: { width: number; height: number }) {
   console.log(value)
-  resizeCardIsScroll.value = elementIsScrollY(listBox.value as HTMLDivElement)
+  resizeCardIsScroll.value = getIsScrollY(listBox.value as HTMLDivElement)
 }
 onMounted(() => {
   nextTick(() => {
-    resizeCardIsScroll.value = elementIsScrollY(listBox.value as HTMLDivElement)
+    resizeCardIsScroll.value = getIsScrollY(listBox.value as HTMLDivElement)
   })
 })
 </script>

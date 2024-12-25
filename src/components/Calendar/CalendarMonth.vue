@@ -272,6 +272,11 @@ function getMonthCalendar(year: number, month: number, option: OptionType = {}):
         color: var(--el-color-primary);
       }
     }
+    &.calendar-month-cell-now.calendar-month-cell-jie {
+      .calendar-month-cell-chinese {
+        color: #fff;
+      }
+    }
   }
   .calendar-month-cell:nth-child(7n + 1) {
     border-left: 0;
