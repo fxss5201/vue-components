@@ -1,57 +1,68 @@
 <template>
   <div class="calendar-view-box">
-    <div class="form-box">
-      <div class="page-title">配置项：</div>
-      <el-form :model="form" label-width="auto">
-        <el-form-item label="年份">
-          <el-input-number v-model="form.year" :min="1980" placeholder="年份" />
-        </el-form-item>
-        <el-form-item label="最少几周">
-          <el-input-number v-model="form.minWeek" :min="0" :max="10" placeholder="最少几周" />
-        </el-form-item>
-        <el-form-item label="从周几开始">
-          <el-select v-model="form.weekStart" placeholder="从周几开始">
-            <el-option
-              v-for="item in weekNames"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="月格式">
-          <el-select v-model="form.monthFormat" clearable placeholder="月格式">
-            <el-option v-for="item in monthFormatList" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="天格式">
-          <el-select v-model="form.dateFormat" clearable placeholder="天格式">
-            <el-option v-for="item in dateFormatList" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="是否需要假期">
-          <el-checkbox v-model="form.needHoliday" label="假期" />
-        </el-form-item>
-        <el-form-item label="是否需要农历">
-          <el-checkbox v-model="form.needChinese" label="农历" />
-        </el-form-item>
-      </el-form>
-    </div>
-    <div class="component-box">
-      <div class="page-title">展示：</div>
-      <CalendarYear
-        :year="form.year"
-        :min-week="form.minWeek"
-        :week-start="form.weekStart"
-        :month-format="form.monthFormat"
-        :date-format="form.dateFormat"
-        :need-holiday="form.needHoliday"
-        :need-chinese="form.needChinese"
-        @increase-year="increaseYear"
-        @reduce-year="reduceYear"
-        @to-now-year="toNowYear"
-      />
-    </div>
+    <Splitpanes :dbl-click-splitter="false" :push-other-panes="false">
+      <Pane size="25" min-size="20">
+        <div class="form-box">
+          <div class="page-title">配置项：</div>
+          <el-form :model="form" label-width="auto">
+            <el-form-item label="年份">
+              <el-input-number v-model="form.year" :min="1980" placeholder="年份" />
+            </el-form-item>
+            <el-form-item label="最少几周">
+              <el-input-number v-model="form.minWeek" :min="0" :max="10" placeholder="最少几周" />
+            </el-form-item>
+            <el-form-item label="从周几开始">
+              <el-select v-model="form.weekStart" placeholder="从周几开始">
+                <el-option
+                  v-for="item in weekNames"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="月格式">
+              <el-select v-model="form.monthFormat" clearable placeholder="月格式">
+                <el-option
+                  v-for="item in monthFormatList"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="天格式">
+              <el-select v-model="form.dateFormat" clearable placeholder="天格式">
+                <el-option v-for="item in dateFormatList" :key="item" :label="item" :value="item" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="是否需要假期">
+              <el-checkbox v-model="form.needHoliday" label="假期" />
+            </el-form-item>
+            <el-form-item label="是否需要农历">
+              <el-checkbox v-model="form.needChinese" label="农历" />
+            </el-form-item>
+          </el-form>
+        </div>
+      </Pane>
+      <Pane min-size="30">
+        <div class="component-box">
+          <div class="page-title">展示：</div>
+          <CalendarYear
+            :year="form.year"
+            :min-week="form.minWeek"
+            :week-start="form.weekStart"
+            :month-format="form.monthFormat"
+            :date-format="form.dateFormat"
+            :need-holiday="form.needHoliday"
+            :need-chinese="form.needChinese"
+            @increase-year="increaseYear"
+            @reduce-year="reduceYear"
+            @to-now-year="toNowYear"
+          />
+        </div>
+      </Pane>
+    </Splitpanes>
   </div>
 </template>
 
@@ -59,6 +70,8 @@
 import CalendarYear from '@/components/Calendar/CalendarYear.vue'
 import { ref } from 'vue'
 import dayjs from 'dayjs'
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
 
 const form = ref({
   year: dayjs().year(),
@@ -95,20 +108,17 @@ function toNowYear() {
 
 <style lang="scss" scoped>
 .calendar-view-box {
-  display: flex;
-  align-items: flex-start;
-  .form-box {
-    flex: 0 0 280px;
-    margin-right: 12px;
-  }
-  .component-box {
-    flex: auto;
-    padding-left: 12px;
-    border-left: 1px solid var(--el-border-color);
-  }
   .page-title {
     font-weight: 700;
     line-height: 40px;
+  }
+  .form-box {
+    width: 100%;
+    padding-right: 18px;
+  }
+  .component-box {
+    width: 100%;
+    padding-left: 18px;
   }
 }
 </style>
