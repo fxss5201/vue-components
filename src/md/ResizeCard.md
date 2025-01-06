@@ -5,7 +5,7 @@
 ## props
 
 | 属性名 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
+| --- | --- | --- | :--- |
 | defaultWidth | `number` | 600 | 默认宽度 |
 | defaultHeight | `number` | 500 | 默认高度 |
 | minWidth | `number` | 200 | 最小宽度 |
@@ -20,7 +20,7 @@
 ## 事件
 
 | 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| --- | --- | :--- |
 | resize | 大小改变时触发 | `(width: number; height: number) => void` |
 
 ## 例子

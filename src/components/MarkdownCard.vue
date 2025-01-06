@@ -47,5 +47,8 @@ const { html: markdown } = useMarkdown(props.content)
       padding: 6px 8px;
     }
   }
+  a {
+    color: var(--el-color-primary);
+  }
 }
 </style>

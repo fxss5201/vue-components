@@ -5,7 +5,7 @@
 ## props
 
 | 属性名 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
+| --- | --- | --- | :--- |
 | itemWidth | `number` | - | 单个子项宽度 |
 | itemDuration | `number` | - | 单个子项目滚动的耗时，单位ms |
 | length | `number` | - | 一共有多少子项 |
@@ -23,7 +23,7 @@
 ## 事件
 
 | 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| --- | --- | :--- |
 | change | 切换时触发 | `(curNum: number, allNum: number) => void` |
 
 ## 例子

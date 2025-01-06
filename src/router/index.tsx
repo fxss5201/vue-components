@@ -92,6 +92,15 @@ export const routes: RouteRecordRaw[] = [
       title: 'Echarts',
       icon: <DataLine />
     }
+  },
+  {
+    path: '/noticeBar',
+    name: 'noticeBar',
+    component: () => import('../views/NoticeBarView.vue'),
+    meta: {
+      title: '公告栏',
+      iconfont: 'icon-notice'
+    }
   }
 ]
 
