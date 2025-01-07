@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, watch } from 'vue'
 import { useMarkdown } from '@/composables/useMarkdown'
 
 const props = withDefaults(
@@ -14,7 +15,18 @@ const props = withDefaults(
   }
 )
 
-const { html: markdown } = useMarkdown(props.content)
+const markdown = ref('')
+markdown.value = useMarkdown(props.content).html.value
+
+watch(
+  () => props.content,
+  () => {
+    markdown.value = useMarkdown(props.content).html.value
+  },
+  {
+    immediate: true
+  }
+)
 </script>
 
 <style lang="scss">

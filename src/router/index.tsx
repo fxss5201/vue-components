@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
-import { House, Calendar, Coin, VideoPlay, Edit, ChatLineSquare, ScaleToOriginal, DataLine, BottomRight } from '@element-plus/icons-vue'
+import { House, Calendar, Coin, VideoPlay, Edit, ChatLineSquare, ScaleToOriginal, DataLine, BottomRight, Notebook } from '@element-plus/icons-vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -100,6 +100,15 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: '公告栏',
       iconfont: 'icon-notice'
+    }
+  },
+  {
+    path: '/fileView',
+    name: 'fileView',
+    component: () => import('../views/FileView.vue'),
+    meta: {
+      title: '文件预览',
+      icon: <Notebook />
     }
   }
 ]

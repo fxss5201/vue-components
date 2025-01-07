@@ -17,6 +17,7 @@ declare module 'vue' {
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
+    ElImage: typeof import('element-plus/es')['ElImage']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElLink: typeof import('element-plus/es')['ElLink']
@@ -29,12 +30,19 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    ElTree: typeof import('element-plus/es')['ElTree']
+    FileReader: typeof import('./src/components/FileReader.vue')['default']
     IconSvg: typeof import('./src/components/IconSvg.vue')['default']
     MarkdownCard: typeof import('./src/components/MarkdownCard.vue')['default']
     NoticeBar: typeof import('./src/components/NoticeBar.vue')['default']
+    OfficeFileReader: typeof import('./src/components/OfficeFileReader.vue')['default']
     ResizeCard: typeof import('./src/components/ResizeCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SimpleSwiper: typeof import('./src/components/SimpleSwiper.vue')['default']
+    VueIcon: typeof import('./src/components/icons/VueIcon.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

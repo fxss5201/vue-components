@@ -15,6 +15,9 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
+    "@vue-office/docx": "^1.6.3",
+    "@vue-office/excel": "^1.7.14",
+    "@vue-office/pdf": "^2.0.10",
     "@vueuse/core": "^11.0.3",
     "@vueuse/integrations": "^11.1.0",
     "axios": "^1.7.2",
@@ -31,7 +34,9 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
     "splitpanes": "^3.1.5",
+    "vscode-icons-js": "^11.6.1",
     "vue": "^3.4.29",
+    "vue-demi": "^0.14.10",
     "vue-router": "^4.3.3"
   },
   "devDependencies": {
