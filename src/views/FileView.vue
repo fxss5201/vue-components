@@ -126,7 +126,7 @@ const loadNode = async (node: Node, resolve: (data: FileNode[]) => void) => {
 const rootFiles = ref<FileNode[]>([])
 
 async function selectDirectoryFn() {
-  if (!window.showDirectoryPicker) {
+  if (!(window as any).showDirectoryPicker) {
     ElMessage.warning('当前浏览器不支持')
     return
   }
@@ -135,7 +135,7 @@ async function selectDirectoryFn() {
     rootFiles.value = []
     currentFile.value = null
     imgFileHandles.value = []
-    dirHandle = await window.showDirectoryPicker()
+    dirHandle = await (window as any).showDirectoryPicker()
     if (!dirHandle) {
       return
     }
@@ -159,7 +159,7 @@ async function selectDirectoryFn() {
 async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKey: string = '') {
   const currentRankFiles: FileNode[] = []
   const imgListFileHandle: FileSystemFileHandle[] = []
-  for await (let handelEle of dirHandle.values()) {
+  for await (let handelEle of (dirHandle as any).values()) {
     const fileKey = `${parentKey}/${handelEle.name}`
     currentRankFiles.push({
       key: fileKey,
