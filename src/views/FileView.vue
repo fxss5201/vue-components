@@ -8,7 +8,8 @@
         <Pane size="20" min-size="15">
           <div class="file-view__left">
             <el-scrollbar>
-              <el-tree class="file-tree"
+              <el-tree
+                class="file-tree"
                 :props="props"
                 :load="loadNode"
                 :icon="ArrowRight"
@@ -16,26 +17,39 @@
                 node-key="key"
                 lazy
                 :default-expanded-keys="[rootFiles[0].key]"
-                @node-click="fileNodeClickFn">
+                @node-click="fileNodeClickFn"
+              >
                 <template #default="{ node, data }">
                   <div class="file-tree-node">
                     <template v-if="data.leaf">
                       <el-image :src="`./icons/${data.fileIcon}`" alt="file" class="file-icon">
                         <template #placeholder>
-                          <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon">
+                          <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
                         </template>
                         <template #error>
-                          <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon">
+                          <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
                         </template>
                       </el-image>
                     </template>
                     <template v-else>
-                      <el-image :src="`./icons/${node.expanded ? data.openFolderIcon : data.folderIcon}`" alt="folder" class="file-icon">
+                      <el-image
+                        :src="`./icons/${node.expanded ? data.openFolderIcon : data.folderIcon}`"
+                        alt="folder"
+                        class="file-icon"
+                      >
                         <template #placeholder>
-                          <img :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`" alt="folder" class="file-icon">
+                          <img
+                            :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
+                            alt="folder"
+                            class="file-icon"
+                          />
                         </template>
                         <template #error>
-                          <img :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`" alt="folder" class="file-icon">
+                          <img
+                            :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
+                            alt="folder"
+                            class="file-icon"
+                          />
                         </template>
                       </el-image>
                     </template>
@@ -49,15 +63,13 @@
         <Pane min-size="30">
           <div class="file-view__right">
             <div class="file-view-body">
-              <el-scrollbar>
-                <FileReader
-                  v-if="currentFile"
-                  :file="currentFile"
-                  :imgFileHandles="imgFileHandles"
-                  boxHeight="calc(100vh - 128px)"
-                />
-                <div v-else class="empty">请选择文件</div>
-              </el-scrollbar>
+              <FileReader
+                v-if="currentFile"
+                :file="currentFile"
+                :imgFileHandles="imgFileHandles"
+                boxHeight="calc(100vh - 128px)"
+              />
+              <div v-else class="empty">请选择文件</div>
             </div>
           </div>
         </Pane>
@@ -88,7 +100,7 @@ interface Tree {
 const props = {
   label: 'name',
   children: 'children',
-  isLeaf: 'leaf',
+  isLeaf: 'leaf'
 }
 
 interface FileNode extends Tree {
@@ -121,6 +133,8 @@ async function selectDirectoryFn() {
   let dirHandle: FileSystemDirectoryHandle | null = null
   try {
     rootFiles.value = []
+    currentFile.value = null
+    imgFileHandles.value = []
     dirHandle = await window.showDirectoryPicker()
     if (!dirHandle) {
       return
@@ -154,9 +168,9 @@ async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKey: stri
       folderIcon: getIconForFolder(handelEle.name),
       openFolderIcon: getIconForOpenFolder(handelEle.name),
       leaf: handelEle.kind === 'file',
-      file: handelEle as FileSystemFileHandle,
+      file: handelEle as FileSystemFileHandle
     })
-    
+
     if (handelEle.kind === 'file') {
       const fileType = handelEle.name.split('.').pop()
       if (fileType && imgFileTypeList.includes(fileType)) {
@@ -166,7 +180,7 @@ async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKey: stri
   }
   imgFileHandles.value = imgListFileHandle
   // 按照文件夹在前，文件在后排序
-  currentRankFiles.sort((a,b) => {
+  currentRankFiles.sort((a, b) => {
     if (!a.leaf && b.leaf) {
       return -1
     }
@@ -234,7 +248,7 @@ const fileNodeClickFn = async (data: FileNode) => {
       display: flex;
       align-items: center;
       overflow: hidden;
-      
+
       .file-icon {
         flex: 0 0 auto;
         width: 18px;
