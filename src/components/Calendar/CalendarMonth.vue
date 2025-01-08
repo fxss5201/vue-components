@@ -45,7 +45,16 @@ interface Props {
   needChinese?: boolean
 }
 
-const props = defineProps<Props>()
+const defaultWeekStart = 1
+
+const props = withDefaults(defineProps<Props>(), {
+  minWeek: 0,
+  weekStart: defaultWeekStart,
+  monthFormat: 'YYYY-MM',
+  dateFormat: 'DD',
+  needHoliday: false,
+  needChinese: false
+})
 
 const monthData = ref<MonthType>({
   month: '',
@@ -68,12 +77,12 @@ watch(
   () => props,
   (newValue) => {
     monthData.value = getMonthCalendar(newValue.year, newValue.month, {
-      minWeek: newValue.minWeek ?? 0,
-      weekStart: newValue.weekStart ?? defaultWeekStart,
-      monthFormat: newValue.monthFormat || 'YYYY-MM',
-      dateFormat: newValue.dateFormat || 'DD',
-      needHoliday: newValue.needHoliday || false,
-      needChinese: newValue.needChinese || false
+      minWeek: newValue.minWeek,
+      weekStart: newValue.weekStart,
+      monthFormat: newValue.monthFormat,
+      dateFormat: newValue.dateFormat,
+      needHoliday: newValue.needHoliday,
+      needChinese: newValue.needChinese
     })
 
     const weekStart = newValue.weekStart ?? defaultWeekStart
@@ -86,8 +95,6 @@ watch(
   },
   { deep: true, immediate: true }
 )
-
-const defaultWeekStart = 1
 
 function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate()
