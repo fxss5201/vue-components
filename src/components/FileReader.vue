@@ -1,14 +1,16 @@
 <template>
-  <el-scrollbar ref="scrollbarRef" v-if="mdFileTypeList.includes(fileType)">
-    <MarkdownCard :content="fileReader as string"></MarkdownCard>
-  </el-scrollbar>
+  <div class="file-md-box" v-loading="fileLoading" v-if="mdFileTypeList.includes(fileType) || codeFileTypeList.includes(fileType)">
+    <el-scrollbar ref="scrollbarRef">
+      <MarkdownCard :content="fileReader as string"></MarkdownCard>
+    </el-scrollbar>
+  </div>
   <OfficeFileReader
-    v-if="officeFileTypeList.includes(fileType)"
+    v-else-if="officeFileTypeList.includes(fileType)"
     :fileType="fileType"
     :fileReader="fileReader as ArrayBuffer"
     :boxHeight="boxHeight"
   ></OfficeFileReader>
-  <div class="file-img-box" :style="{ height: boxHeight }">
+  <div v-else-if="imgFileTypeList.includes(fileType)" class="file-img-box" :style="{ height: boxHeight }">
     <el-image
       style="max-width: 100%"
       :src="fileReader"
@@ -16,17 +18,21 @@
       :max-scale="7"
       :min-scale="0.2"
       :preview-src-list="imgUrlList"
+      :initial-index="imgFileIndex"
+      :infinite="false"
       fit="cover"
       preview-teleported
       :zIndex="1000"
     />
   </div>
+  <div v-else>暂不支持.{{ fileType }}后缀类型的文件展示</div>
 </template>
 
 <script lang="ts" setup>
 import { nextTick, ref, watch } from 'vue'
 import MarkdownCard from '@/components/MarkdownCard.vue'
 import OfficeFileReader from '@/components/OfficeFileReader.vue'
+import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList } from '@/config/fileConfig'
 
 const props = defineProps<{
   file: FileSystemFileHandle
@@ -35,14 +41,10 @@ const props = defineProps<{
 }>()
 
 const scrollbarRef = ref()
-
-const imgFileTypeList = ['jpg', 'png', 'gif', 'jpeg']
-const mdFileTypeList = ['md']
-const codeFileTypeList = ['js', 'ts', 'css', 'html', 'vue']
-const officeFileTypeList = ['docx', 'xlsx', 'pdf']
-
+const fileLoading = ref(false)
 const fileType = ref('')
 const fileReader = ref<FileReader['result']>('')
+const imgFileIndex = ref(0)
 
 const imgUrlList = ref<string[]>([])
 
@@ -67,21 +69,30 @@ watch(
       const imgUrls: string[] = []
       for (let idx = 0; idx < props.imgFileHandles.length; idx++) {
         const item = props.imgFileHandles[idx]
-        const file = await item.getFile()
-        imgUrls.push(URL.createObjectURL(file))
+        if (item.name === file.name) {
+          imgFileIndex.value = idx
+          imgUrls.push(fileReader.value)
+        } else {
+          const file = await item.getFile()
+          imgUrls.push(URL.createObjectURL(file))
+        }
       }
       imgUrlList.value = imgUrls
       return
     } else if (mdFileTypeList.includes(fileType.value)) {
+      fileLoading.value = true
       reader.readAsText(file)
       reader.onload = () => {
+        fileLoading.value = false
         fileReader.value = reader.result as string
       }
       return
     } else if (codeFileTypeList.includes(fileType.value)) {
+      fileLoading.value = true
       reader.readAsText(file)
       reader.onload = () => {
-        console.log(reader.result) // 读取到的文件内容
+        fileLoading.value = false
+        fileReader.value = `\n\`\`\`${fileType.value}\n${reader.result}\n\`\`\`\n`
       }
       return
     } else if (officeFileTypeList.includes(fileType.value)) {
@@ -103,6 +114,10 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+.file-md-box {
+  width: 100%;
+  height: 100%;
+}
 .file-img-box {
   width: 100%;
   display: flex;

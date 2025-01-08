@@ -88,8 +88,8 @@ import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-i
 import { ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import FileReader from '@/components/FileReader.vue'
+import { imgFileTypeList } from '@/config/fileConfig'
 
-const imgFileTypeList = ['jpg', 'png', 'gif', 'jpeg']
 const imgFileHandles = ref<FileSystemFileHandle[]>([])
 
 interface Tree {
@@ -126,7 +126,8 @@ const loadNode = async (node: Node, resolve: (data: FileNode[]) => void) => {
 const rootFiles = ref<FileNode[]>([])
 
 async function selectDirectoryFn() {
-  if (!(window as any).showDirectoryPicker) {
+  // @ts-ignore
+  if (!window.showDirectoryPicker) {
     ElMessage.warning('当前浏览器不支持')
     return
   }
@@ -135,7 +136,8 @@ async function selectDirectoryFn() {
     rootFiles.value = []
     currentFile.value = null
     imgFileHandles.value = []
-    dirHandle = await (window as any).showDirectoryPicker()
+    // @ts-ignore
+    dirHandle = await window.showDirectoryPicker()
     if (!dirHandle) {
       return
     }
@@ -159,7 +161,8 @@ async function selectDirectoryFn() {
 async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKey: string = '') {
   const currentRankFiles: FileNode[] = []
   const imgListFileHandle: FileSystemFileHandle[] = []
-  for await (let handelEle of (dirHandle as any).values()) {
+  // @ts-ignore
+  for await (let handelEle of dirHandle.values()) {
     const fileKey = `${parentKey}/${handelEle.name}`
     currentRankFiles.push({
       key: fileKey,
