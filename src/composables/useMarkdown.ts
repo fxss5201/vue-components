@@ -26,8 +26,9 @@ import vueJs from '@shikijs/langs/vue'
 import githubDark from '@shikijs/themes/github-dark'
 import { createHighlighterCoreSync, type HighlighterCore } from 'shiki/core'
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript'
+import type MarkdownIt from 'markdown-it/index.js'
 
-const md = new markdownIt({
+const md: MarkdownIt = new markdownIt({
   html: true,
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
