@@ -5,16 +5,23 @@
   >
     <VueOfficeDocx
       class="file-reader-docs"
-      v-if="props.fileType === 'docx'"
+      v-if="docxlist.includes(props.fileType)"
       :src="props.fileReader"
       style="height: 100%;"
       @rendered="renderedHandler"
       @error="errorHandler"
     />
     <vue-office-excel
-      v-else-if="props.fileType === 'xlsx'"
+      v-else-if="excelList.includes(props.fileType)"
       :src="props.fileReader"
       :options="excelOptions"
+      style="height: 100%;"
+      @rendered="renderedHandler"
+      @error="errorHandler"
+    />
+    <vue-office-pptx
+      v-else-if="pptList.includes(props.fileType)"
+      :src="props.fileReader"
       style="height: 100%;"
       @rendered="renderedHandler"
       @error="errorHandler"
@@ -37,6 +44,7 @@ import '@vue-office/docx/lib/index.css'
 import VueOfficeExcel from '@vue-office/excel'
 import '@vue-office/excel/lib/index.css'
 import VueOfficePdf from '@vue-office/pdf'
+import VueOfficePptx from '@vue-office/pptx'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps<{
@@ -46,6 +54,9 @@ const props = defineProps<{
 }>()
 
 const loading = ref(false)
+const docxlist = ref(['docx'])
+const excelList = ref(['xlsx', 'xls'])
+const pptList = ref(['pptx'])
 
 const excelOptions = computed(() => {
   return {

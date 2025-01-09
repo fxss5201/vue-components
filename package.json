@@ -18,6 +18,7 @@
     "@vue-office/docx": "^1.6.3",
     "@vue-office/excel": "^1.7.14",
     "@vue-office/pdf": "^2.0.10",
+    "@vue-office/pptx": "^1.0.0",
     "@vueuse/core": "^11.0.3",
     "@vueuse/integrations": "^11.1.0",
     "axios": "^1.7.2",

@@ -25,6 +25,15 @@
       :zIndex="1000"
     />
   </div>
+  <div v-else-if="videoFileTypeList.includes(fileType)" class="file-video-box" :style="{ height: boxHeight }">
+    <video
+      controls
+      autoplay
+      style="max-width: 100%"
+      :src="(fileReader as string)"
+    >
+    </video>
+  </div>
   <div v-else>暂不支持.{{ fileType }}后缀类型的文件展示</div>
 </template>
 
@@ -32,7 +41,7 @@
 import { nextTick, ref, watch } from 'vue'
 import MarkdownCard from '@/components/MarkdownCard.vue'
 import OfficeFileReader from '@/components/OfficeFileReader.vue'
-import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList } from '@/config/fileConfig'
+import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList } from '@/config/fileConfig'
 
 const props = defineProps<{
   file: FileSystemFileHandle
@@ -101,6 +110,9 @@ watch(
         fileReader.value = reader.result as ArrayBuffer
       }
       return
+    } else if (videoFileTypeList.includes(fileType.value)) {
+      fileReader.value = URL.createObjectURL(file)
+      return
     }
     reader.readAsText(file)
     reader.onload = () => {
@@ -118,7 +130,8 @@ watch(
   width: 100%;
   height: 100%;
 }
-.file-img-box {
+.file-img-box,
+.file-video-box {
   width: 100%;
   display: flex;
   align-items: center;
