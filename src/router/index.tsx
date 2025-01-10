@@ -110,6 +110,15 @@ export const routes: RouteRecordRaw[] = [
       title: '文件预览',
       icon: <Notebook />
     }
+  },
+  {
+    path: '/codePage',
+    name: 'codePage',
+    component: () => import('../views/CodePage.vue'),
+    meta: {
+      title: '代码编辑',
+      iconfont: 'icon-code'
+    }
   }
 ]
 

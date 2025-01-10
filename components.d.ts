@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     CalendarMonth: typeof import('./src/components/Calendar/CalendarMonth.vue')['default']
     CalendarYear: typeof import('./src/components/Calendar/CalendarYear.vue')['default']
+    CodeCard: typeof import('./src/components/CodeCard.vue')['default']
     EchartsCard: typeof import('./src/components/EchartsCard.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']

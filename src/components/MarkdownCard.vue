@@ -30,15 +30,6 @@ watch(
 </script>
 
 <style lang="scss">
-pre {
-  padding: 1em;
-  overflow: auto;
-  scrollbar-width: thin;
-  color: #1f2328;
-  background-color: #f6f8fa;
-  border-radius: 6px;
-  font-family: DM Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
-}
 .markdown-body {
   pre + pre {
     margin-top: 1em;

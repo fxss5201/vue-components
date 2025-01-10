@@ -141,6 +141,12 @@ async function selectDirectoryFn() {
     if (!dirHandle) {
       return
     }
+
+    const isPermission = await verifyPermission(dirHandle, 'readwrite')
+    if (!isPermission) {
+      ElMessage.warning('当前仅有文件访问权限，如需编辑，请授予文件编辑权限')
+    }
+
     rootFiles.value = [
       {
         key: `/${dirHandle.name}`,
@@ -156,6 +162,28 @@ async function selectDirectoryFn() {
   } catch (error) {
     ElMessage.error('请授予文件访问权限')
   }
+}
+
+async function verifyPermission(fileHandle: FileSystemDirectoryHandle, withWrite: string = 'read') {
+  // read / readwrite
+  const opts = {
+    mode: withWrite
+  }
+
+  // 检查是否已经拥有相应权限，如果是，返回 true。
+  // @ts-ignore
+  if ((await fileHandle.queryPermission(opts)) === 'granted') {
+    return true
+  }
+
+  // 为文件请求权限，如果用户授予了权限，返回 true。
+  // @ts-ignore
+  if ((await fileHandle.requestPermission(opts)) === 'granted') {
+    return true
+  }
+
+  // 用户没有授权，返回 false。
+  return false
 }
 
 async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKey: string = '') {
