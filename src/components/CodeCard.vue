@@ -2,6 +2,7 @@
   <div class="code-card"
     :style="{ backgroundColor: bgColorStyle }">
     <div v-if="!props.isEditor" class="code-card-tool" :style="{ color: colorStyle }">
+      <div v-if="props.lang" class="code-lang">{{ props.lang }}</div>
       <template v-if="isSupported">
         <svg v-if="copied" aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16">
           <path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
@@ -12,7 +13,6 @@
           <path fill="currentColor" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
         </svg>
       </template>
-      <div v-if="props.lang" class="code-lang">{{ props.lang }}</div>
     </div>
     <div class="code-wrap">
       <div class="code-line-box"
@@ -21,9 +21,10 @@
         <div class="code-line" v-for="item in codeLines" :key="item">{{ item }}</div>
       </div>
       <div class="code-content">
-        <div class="code-body">
-          <textarea v-if="props.isEditor" class="code-input" v-model="model" spellcheck="false"></textarea>
-          <div class="code-text" v-html="codeHtml"></div>
+        <div ref="codeBodyRef" class="code-body">
+          <textarea v-if="props.isEditor" ref="textareaRef" class="code-input" v-model="model" spellcheck="false"></textarea>
+          <div class="code-text" v-html="codeHtml"
+            :style="{ paddingBottom: props.isEditor ? '21px' : 0 }"></div>
         </div>
       </div>
     </div>
@@ -31,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useClipboard } from '@vueuse/core'
 
 import vueJs from '@shikijs/langs/vue'
@@ -96,6 +97,25 @@ const codeLines = computed(() => {
 })
 
 const { copy, copied, isSupported } = useClipboard()
+
+const codeBodyRef = ref<HTMLDivElement>()
+const textareaRef = ref<HTMLTextAreaElement>()
+watch(
+  () => model.value,
+  () => {
+    if (model.value && props.isEditor) {
+      nextTick(() => {
+        const minWidth = codeBodyRef.value!.offsetWidth
+        const code = codeBodyRef.value!.querySelector('code')
+        const codeWidth = code!.offsetWidth
+        textareaRef.value!.style.width = Math.max(minWidth, codeWidth) + 'px'
+      })
+    }
+  },
+  {
+    immediate: true
+  }
+)
 </script>
 
 <style lang="scss">
@@ -110,8 +130,8 @@ const { copy, copied, isSupported } = useClipboard()
 
   .code-card-tool {
     position: absolute;
-    top: 0.3em;
-    right: 0.5em;
+    top: 0;
+    right: 0.2em;
     z-index: 10;
     display: flex;
     align-items: center;
@@ -119,7 +139,7 @@ const { copy, copied, isSupported } = useClipboard()
     width: auto;
 
     .code-lang {
-      margin-left: 3px;
+      margin-right: 5px;
     }
   }
 
@@ -152,8 +172,8 @@ const { copy, copied, isSupported } = useClipboard()
         position: absolute;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
+        width: 100%;
+        height: 100%;
         z-index: 1;
         border: 0;
         outline: none;
@@ -167,9 +187,6 @@ const { copy, copied, isSupported } = useClipboard()
         white-space: nowrap;
         caret-color: rgb(156, 163, 175);
         cursor: text;
-      }
-      .code-text {
-        padding-bottom: 21px;
       }
     }
   }
