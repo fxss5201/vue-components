@@ -23,8 +23,10 @@
       <div class="code-content">
         <div ref="codeBodyRef" class="code-body">
           <textarea v-if="props.isEditor" ref="textareaRef" class="code-input" v-model="model" spellcheck="false"></textarea>
-          <div class="code-text" v-html="codeHtml"
-            :style="{ paddingBottom: props.isEditor ? '21px' : 0 }"></div>
+          <div class="code-text"
+            :style="{ paddingBottom: props.isEditor ? '21px' : 0 }">
+            <pre :class="[isVue ? 'shiki github-dark' : 'hljs']" :style="[isVue ? 'background-color:#24292e;color:#e1e4e8' : '']"><code ref="codeRef" v-html="codeHtml"></code></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -32,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, nextTick, onMounted, watch } from 'vue'
+import { ref, computed, nextTick, onMounted, watch, onUpdated } from 'vue'
 import { useClipboard, useElementSize } from '@vueuse/core'
 
 import vueJs from '@shikijs/langs/vue'
@@ -59,30 +61,33 @@ const props = defineProps({
   }
 })
 
+const isVue = computed(() => props.lang === 'vue')
+
 const codeHtml = computed(() => {
   const lang = props.lang
   const str = model.value
   if (lang && hljs.getLanguage(lang)) {
-      try {
-        return '<pre class="hljs"><code>' +
-               hljs.highlight(lang, str, true).value +
-               '</code></pre>'
-      } catch (__) {
-        return '<pre class="hljs"><code>' + str + '</code></pre>'
-      }
-    } else if (lang === 'vue') {
-      const shiki: HighlighterCore = createHighlighterCoreSync({
-        themes: [githubDark],
-        langs: [vueJs],
-        engine: createJavaScriptRegexEngine()
-      })
-      return shiki.codeToHtml(str, {
-        lang: props.lang,
-        theme: 'github-dark'
-      })
+    try {
+      return hljs.highlight(lang, str, true).value
+    } catch (__) {
+      return str
     }
+  } else if (lang === 'vue') {
+    const shiki: HighlighterCore = createHighlighterCoreSync({
+      themes: [githubDark],
+      langs: [vueJs],
+      engine: createJavaScriptRegexEngine()
+    })
+    const codeHtml = shiki.codeToHtml(str, {
+      lang: props.lang,
+      theme: 'github-dark'
+    })
+    const codeStartIndex = codeHtml.indexOf('<code')
+    const codeEndIndex = codeHtml.lastIndexOf('</code>')
+    return codeHtml.substring(codeStartIndex + 6, codeEndIndex)
+  }
 
-    return '<pre class="hljs"><code>' + str + '</code></pre>'
+  return str
 })
 
 const colorStyle = ref('#e1e4e8')
@@ -101,16 +106,9 @@ const { copy, copied, isSupported } = useClipboard()
 const codeBodyRef = ref<HTMLDivElement>()
 const { width: codeBodyWidth } = useElementSize(codeBodyRef)
 const textareaRef = ref<HTMLTextAreaElement>()
+const codeRef = ref<HTMLElement>()
 watch(
   () => codeBodyWidth.value,
-  () => {
-    if (props.isEditor) {
-      changeTextareaWidth()
-    }
-  }
-)
-watch(
-  () => model.value,
   () => {
     if (props.isEditor) {
       changeTextareaWidth()
@@ -124,11 +122,15 @@ onMounted(() => {
     }
   })
 })
+onUpdated(() => {
+  nextTick(() => {
+    if (props.isEditor) {
+      changeTextareaWidth()
+    }
+  })
+})
 function changeTextareaWidth () {
-  const codeElement = codeBodyRef.value!.querySelector('code')
-  const codeElementWidth = codeElement!.offsetWidth
-  console.log(codeBodyWidth.value, codeElementWidth)
-  textareaRef.value!.style.width = Math.max(codeBodyWidth.value, codeElementWidth) + 'px'
+  textareaRef.value!.style.width = Math.max(codeBodyWidth.value, codeRef.value!.offsetWidth) + 'px'
 }
 </script>
 

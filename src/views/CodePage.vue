@@ -1,6 +1,6 @@
 <template>
   <div class="code-page">
-    <CodeCard v-model="code" lang="vue"></CodeCard>
+    <CodeCard v-model="code" lang="vue" :isEditor="true"></CodeCard>
     <CodeCard v-model="code2" lang="ts" :isEditor="true"></CodeCard>
   </div>
 </template>
