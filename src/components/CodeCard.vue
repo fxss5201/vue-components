@@ -22,7 +22,7 @@
       </div>
       <div class="code-content">
         <div ref="codeBodyRef" class="code-body">
-          <textarea v-if="props.isEditor" ref="textareaRef" class="code-input" v-model="model" spellcheck="false"></textarea>
+          <textarea v-if="props.isEditor" ref="textareaRef" class="code-input" v-model="model" v-on-key-stroke:c,s="onSaveFileFn" spellcheck="false"></textarea>
           <div class="code-text"
             :style="{ paddingBottom: props.isEditor ? '21px' : 0 }">
             <pre :class="[isVue ? 'shiki github-dark' : 'hljs']" :style="[isVue ? 'background-color:#24292e;color:#e1e4e8' : '']"><code ref="codeRef" v-html="codeHtml"></code></pre>
@@ -36,6 +36,7 @@
 <script lang="ts" setup>
 import { ref, computed, nextTick, onMounted, watch, onUpdated } from 'vue'
 import { useClipboard, useElementSize } from '@vueuse/core'
+import { vOnKeyStroke } from '@vueuse/components'
 
 import vueJs from '@shikijs/langs/vue'
 import githubDark from '@shikijs/themes/github-dark'
@@ -43,6 +44,7 @@ import { createHighlighterCoreSync, type HighlighterCore } from 'shiki/core'
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark-dimmed.min.css'
+import { ElMessage } from 'element-plus'
 
 const model = defineModel({ type: String, default: '' })
 
@@ -58,6 +60,10 @@ const props = defineProps({
   isEditor: {
     type: Boolean,
     default: false
+  },
+  file: {
+    type: Object as () => FileSystemFileHandle,
+    required: false
   }
 })
 
@@ -131,6 +137,16 @@ onUpdated(() => {
 })
 function changeTextareaWidth () {
   textareaRef.value!.style.width = Math.max(codeBodyWidth.value, codeRef.value!.offsetWidth) + 'px'
+}
+
+async function onSaveFileFn (event: KeyboardEvent) {
+  event.preventDefault()
+  if (props.file) {
+    const writable = await props.file.createWritable()
+    await writable.write(model.value)
+    await writable.close()
+    ElMessage.success('保存成功')
+  }
 }
 </script>
 

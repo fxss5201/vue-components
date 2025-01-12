@@ -67,6 +67,7 @@
                 v-if="currentFile"
                 :file="currentFile"
                 :imgFileHandles="imgFileHandles"
+                :editorPermission="isEditorPermission"
                 boxHeight="calc(100vh - 128px)"
               />
               <div v-else class="empty">请选择文件</div>
@@ -114,6 +115,7 @@ interface FileNode extends Tree {
 const defaultFileIcon = getIconForFile('default')
 const defaultFolderIcon = getIconForFolder('default')
 const defaultOpenFolderIcon = getIconForOpenFolder('default')
+const isEditorPermission = ref(false)
 
 const loadNode = async (node: Node, resolve: (data: FileNode[]) => void) => {
   if (node.level === 0) {
@@ -142,8 +144,8 @@ async function selectDirectoryFn() {
       return
     }
 
-    const isPermission = await verifyPermission(dirHandle, 'readwrite')
-    if (!isPermission) {
+    isEditorPermission.value = await verifyPermission(dirHandle, 'readwrite')
+    if (!isEditorPermission.value) {
       ElMessage.warning('当前仅有文件访问权限，如需编辑，请授予文件编辑权限')
     }
 

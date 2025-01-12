@@ -1,7 +1,8 @@
 <template>
   <div class="file-md-box" v-loading="fileLoading" v-if="mdFileTypeList.includes(fileType) || codeFileTypeList.includes(fileType)">
     <el-scrollbar ref="scrollbarRef">
-      <MarkdownCard :content="fileReader as string"></MarkdownCard>
+      <MarkdownCard v-if="mdFileTypeList.includes(fileType)" :content="fileReader as string"></MarkdownCard>
+      <CodeCard v-else v-model="fileReader as string" :lang="fileType" :is-editor="editorPermission" :file="props.file"></CodeCard>
     </el-scrollbar>
   </div>
   <OfficeFileReader
@@ -42,11 +43,13 @@ import { nextTick, ref, watch } from 'vue'
 import MarkdownCard from '@/components/MarkdownCard.vue'
 import OfficeFileReader from '@/components/OfficeFileReader.vue'
 import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList } from '@/config/fileConfig'
+import CodeCard from '@/components/CodeCard.vue'
 
 const props = defineProps<{
   file: FileSystemFileHandle
   imgFileHandles: FileSystemFileHandle[]
   boxHeight: string
+  editorPermission: boolean
 }>()
 
 const scrollbarRef = ref()
@@ -101,7 +104,7 @@ watch(
       reader.readAsText(file)
       reader.onload = () => {
         fileLoading.value = false
-        fileReader.value = `\n\`\`\`${fileType.value}\n${reader.result}\n\`\`\`\n`
+        fileReader.value = reader.result as string
       }
       return
     } else if (officeFileTypeList.includes(fileType.value)) {
