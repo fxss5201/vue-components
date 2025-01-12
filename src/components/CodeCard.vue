@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, nextTick, onMounted, watch } from 'vue'
 import { useClipboard, useElementSize } from '@vueuse/core'
 
 import vueJs from '@shikijs/langs/vue'
@@ -101,46 +101,35 @@ const { copy, copied, isSupported } = useClipboard()
 const codeBodyRef = ref<HTMLDivElement>()
 const { width: codeBodyWidth } = useElementSize(codeBodyRef)
 const textareaRef = ref<HTMLTextAreaElement>()
-let codeElement = ref<HTMLElement | null>(null)
-const codeElementWidth = ref(0)
-// const resizeObserver = new ResizeObserver((entries) => {
-//   console.log('ResizeObserver callback:', entries)
-//   for (const entry of entries) {
-//     const codeElementWidth = (entry.target as HTMLElement).offsetWidth
-//     console.log('codeElementWidth:', codeElementWidth)
-//     textareaRef.value!.style.width = Math.max(codeBodyWidth.value, codeElementWidth) + 'px'
-//   }
-// })
 watch(
   () => codeBodyWidth.value,
   () => {
     if (props.isEditor) {
-      textareaRef.value!.style.width = Math.max(codeBodyWidth.value, codeElementWidth.value) + 'px'
+      changeTextareaWidth()
     }
   }
 )
 watch(
-  () => codeElementWidth.value,
+  () => model.value,
   () => {
     if (props.isEditor) {
-      textareaRef.value!.style.width = Math.max(codeBodyWidth.value, codeElementWidth.value) + 'px'
+      changeTextareaWidth()
     }
   }
 )
 onMounted(() => {
   nextTick(() => {
     if (props.isEditor) {
-      codeElement.value = codeBodyRef.value!.querySelector('code')
-      codeElementWidth.value = useElementSize(codeElement).width.value
-      // resizeObserver!.observe(codeElement.value! as HTMLElement)
+      changeTextareaWidth()
     }
   })
 })
-// onBeforeUnmount(() => {
-//   if (props.isEditor) {
-//     resizeObserver!.unobserve(codeElement.value! as HTMLElement)
-//   }
-// })
+function changeTextareaWidth () {
+  const codeElement = codeBodyRef.value!.querySelector('code')
+  const codeElementWidth = codeElement!.offsetWidth
+  console.log(codeBodyWidth.value, codeElementWidth)
+  textareaRef.value!.style.width = Math.max(codeBodyWidth.value, codeElementWidth) + 'px'
+}
 </script>
 
 <style lang="scss">
