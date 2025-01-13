@@ -15,7 +15,7 @@ export function addCodeCopy () {
       clipboardTime.value = setTimeout(() => {
         (e.trigger.previousElementSibling as HTMLElement)!.style.display = 'none';
         (e.trigger as HTMLElement)!.style.display = 'block'
-      }, 1000)
+      }, 1000) as unknown as number
     })
     clipboard.value!.on('error', () => {
       ElMessage.error('复制失败')
