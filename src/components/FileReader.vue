@@ -1,9 +1,26 @@
 <template>
-  <div class="file-md-box" v-loading="fileLoading" v-if="mdFileTypeList.includes(fileType) || codeFileTypeList.includes(fileType)">
-    <el-scrollbar ref="scrollbarRef">
-      <MarkdownCard v-if="mdFileTypeList.includes(fileType)" :content="fileReader as string"></MarkdownCard>
-      <CodeCard v-else v-model="fileReader as string" :lang="fileType" :is-editor="editorPermission" :file="props.file"></CodeCard>
+  <div class="file-code-box" v-loading="fileLoading" v-if="codeFileTypeList.includes(fileType)">
+    <el-scrollbar ref="scrollbarCodeRef">
+      <CodeCard v-model="fileReader as string" :lang="fileType" :is-editor="editorPermission" :file="props.file"></CodeCard>
     </el-scrollbar>
+  </div>
+  <div class="file-md-box" v-loading="fileLoading" v-else-if="mdFileTypeList.includes(fileType)">
+    <Splitpanes :dbl-click-splitter="false" :push-other-panes="false">
+      <Pane size="50" min-size="20">
+        <div class="full-block" style="padding-right: 12px;">
+          <el-scrollbar ref="scrollbarCodeMdRef">
+            <CodeCard v-model="fileReader as string" :lang="fileType" :is-editor="editorPermission" :file="props.file"></CodeCard>
+          </el-scrollbar>
+        </div>
+      </Pane>
+      <Pane size="50" min-size="20">
+        <div class="full-block" style="padding-left: 12px;">
+          <el-scrollbar ref="scrollbarMdRef">
+            <MarkdownCard :content="fileReader as string"></MarkdownCard>
+          </el-scrollbar>
+        </div>
+      </Pane>
+    </Splitpanes>
   </div>
   <OfficeFileReader
     v-else-if="officeFileTypeList.includes(fileType)"
@@ -45,6 +62,8 @@ import OfficeFileReader from '@/components/OfficeFileReader.vue'
 import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList } from '@/config/fileConfig'
 import CodeCard from '@/components/CodeCard.vue'
 import { addCodeCopy } from '@/composables/addCodeCopy'
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
 
 const props = defineProps<{
   file: FileSystemFileHandle
@@ -53,7 +72,9 @@ const props = defineProps<{
   editorPermission: boolean
 }>()
 
-const scrollbarRef = ref()
+const scrollbarCodeRef = ref()
+const scrollbarCodeMdRef = ref()
+const scrollbarMdRef = ref()
 const fileLoading = ref(false)
 const fileType = ref('')
 const fileReader = ref<FileReader['result']>('')
@@ -67,9 +88,17 @@ watch(
     const file = await props.file.getFile()
     const reader = new FileReader()
     nextTick(() => {
-      if (scrollbarRef.value) {
-        scrollbarRef.value.setScrollTop(0)
-        scrollbarRef.value.setScrollLeft(0)
+      if (scrollbarCodeRef.value) {
+        scrollbarCodeRef.value.setScrollTop(0)
+        scrollbarCodeRef.value.setScrollLeft(0)
+      }
+      if (scrollbarCodeMdRef.value) {
+        scrollbarCodeMdRef.value.setScrollTop(0)
+        scrollbarCodeMdRef.value.setScrollLeft(0)
+      }
+      if (scrollbarMdRef.value) {
+        scrollbarMdRef.value.setScrollTop(0)
+        scrollbarMdRef.value.setScrollLeft(0)
       }
     })
     fileType.value = file.name.split('.').pop() || ''
@@ -132,7 +161,9 @@ addCodeCopy()
 </script>
 
 <style lang="scss" scoped>
-.file-md-box {
+.file-md-box,
+.file-code-box,
+.full-block {
   width: 100%;
   height: 100%;
 }

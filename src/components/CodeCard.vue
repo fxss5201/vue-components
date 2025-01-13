@@ -20,7 +20,7 @@
         :style="{ color: colorStyle, borderRightColor: borderColorStyle }">
         <div class="code-line" v-for="item in codeLines" :key="item">{{ item }}</div>
       </div>
-      <div class="code-content">
+      <div ref="codeContentRef" class="code-content">
         <div ref="codeBodyRef" class="code-body">
           <textarea v-if="props.isEditor" ref="textareaRef" class="code-input" v-model="model" v-on-key-stroke:c,s="onSaveFileFn" spellcheck="false"></textarea>
           <div class="code-text"
@@ -148,6 +148,14 @@ async function onSaveFileFn (event: KeyboardEvent) {
     ElMessage.success('保存成功')
   }
 }
+
+const codeContentRef = ref<HTMLDivElement>()
+watch(
+  () => model.value,
+  () => {
+    codeContentRef.value!.scrollLeft = 0
+  }
+)
 </script>
 
 <style lang="scss">
