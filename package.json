@@ -23,6 +23,7 @@
     "@vueuse/core": "^11.3.0",
     "@vueuse/integrations": "^11.1.0",
     "axios": "^1.7.2",
+    "clipboard": "^2.0.11",
     "conversion-library": "^0.0.16",
     "dayjs": "^1.11.11",
     "echarts": "^5.5.1",

@@ -104,7 +104,7 @@ const bgColorStyle = ref('#24292e')
 
 const codeLines = computed(() => {
   const lines = model.value.split('\n')
-  return [...new Array(lines.length)].map((_, index) => index + 1)
+  return lines.map((_, i) => i + 1)
 })
 
 const { copy, copied, isSupported } = useClipboard()

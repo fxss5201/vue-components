@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import markdownIt from 'markdown-it'
-import type { Options } from 'markdown-it/index.js'
+import type { Options, Renderer, Token } from 'markdown-it/index.js'
 // @ts-ignore
 import markdownItSub from 'markdown-it-sub'
 // @ts-ignore
@@ -27,17 +27,16 @@ import githubDark from '@shikijs/themes/github-dark'
 import { createHighlighterCoreSync, type HighlighterCore } from 'shiki/core'
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript'
 import type MarkdownIt from 'markdown-it/index.js'
+import addCodeCard from './addCodeCard'
 
 const md: MarkdownIt = new markdownIt({
   html: true,
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        return '<pre class="hljs"><code>' +
-               hljs.highlight(lang, str, true).value +
-               '</code></pre>'
+        return `<pre class="hljs"><code>${hljs.highlight(lang, str, true).value}</code></pre>`
       } catch (__) {
-        return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>'
+        return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`
       }
     } else if (lang === 'vue') {
       const shiki: HighlighterCore = createHighlighterCoreSync({
@@ -48,7 +47,7 @@ const md: MarkdownIt = new markdownIt({
       return shiki.codeToHtml(str, { lang: 'vue', theme: 'github-dark' })
     }
 
-    return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>'
+    return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`
   }
 } as Options)
 
@@ -59,6 +58,7 @@ md.use(markdownItLinkAttributes, {
   },
 })
 md.use(tableStylePlugin)
+md.use(codeStylePlugin)
 md.use(markdownItSub)
 md.use(markdownItSup)
 md.use(markdownItFootnote)
@@ -74,6 +74,34 @@ function tableStylePlugin () {
   }
   md.renderer.rules.table_close = function() {
     return '</table>'
+  }
+}
+
+function codeStylePlugin () {
+  md.renderer.rules.code_block = function(tokens: Token[], idx: number) {
+    const token = tokens[idx]
+    const code = token.content
+    return code
+  }
+  md.renderer.rules.fence = function(tokens: Token[], idx: number, options: Options, env: any, self: Renderer) {
+    const token = tokens[idx]
+    const info = token.info ? md.utils.unescapeAll(token.info).trim() : ''
+    let langName = ''
+    let langAttrs = ''
+
+    if (info) {
+      const arr = info.split(/(\s+)/g)
+      langName = arr[0]
+      langAttrs = arr.slice(2).join('')
+    }
+
+    let highlighted
+    if (options.highlight) {
+      highlighted = options.highlight(token.content, langName, langAttrs) || md.utils.escapeHtml(token.content)
+    } else {
+      highlighted = md.utils.escapeHtml(token.content)
+    }
+    return addCodeCard(highlighted, token.content, langName, true)
   }
 }
 

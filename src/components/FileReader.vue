@@ -44,6 +44,7 @@ import MarkdownCard from '@/components/MarkdownCard.vue'
 import OfficeFileReader from '@/components/OfficeFileReader.vue'
 import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList } from '@/config/fileConfig'
 import CodeCard from '@/components/CodeCard.vue'
+import { addCodeCopy } from '@/composables/addCodeCopy'
 
 const props = defineProps<{
   file: FileSystemFileHandle
@@ -126,6 +127,8 @@ watch(
     immediate: true
   }
 )
+
+addCodeCopy()
 </script>
 
 <style lang="scss" scoped>
