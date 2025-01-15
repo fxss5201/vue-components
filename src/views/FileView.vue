@@ -161,8 +161,8 @@ async function selectDirectoryFn() {
       }
     ]
     // rootFiles.value = await getFileList(dirHandle as FileSystemDirectoryHandle, `/${(dirHandle as FileSystemDirectoryHandle).name}`)
-  } catch (error) {
-    ElMessage.error('请授予文件访问权限')
+  } catch (error: any) {
+    ElMessage.error(error.message)
   }
 }
 
