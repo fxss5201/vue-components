@@ -26,9 +26,9 @@
     v-else-if="officeFileTypeList.includes(fileType)"
     :fileType="fileType"
     :fileReader="fileReader as ArrayBuffer"
-    :boxHeight="boxHeight"
+    :fileViewContentHeight="props.fileViewContentHeight"
   ></OfficeFileReader>
-  <div v-else-if="imgFileTypeList.includes(fileType)" class="file-img-box" :style="{ height: boxHeight }">
+  <div v-else-if="imgFileTypeList.includes(fileType)" class="file-img-box" :style="{ height: `${props.fileViewContentHeight}px` }">
     <el-image
       style="max-width: 100%"
       :src="fileReader"
@@ -43,7 +43,7 @@
       :zIndex="1000"
     />
   </div>
-  <div v-else-if="videoFileTypeList.includes(fileType)" class="file-video-box" :style="{ height: boxHeight }">
+  <div v-else-if="videoFileTypeList.includes(fileType)" class="file-video-box" :style="{ height: `${props.fileViewContentHeight}px` }">
     <video
       controls
       autoplay
@@ -68,7 +68,7 @@ import 'splitpanes/dist/splitpanes.css'
 const props = defineProps<{
   file: FileSystemFileHandle
   imgFileHandles: FileSystemFileHandle[]
-  boxHeight: string
+  fileViewContentHeight: number
   editorPermission: boolean
 }>()
 

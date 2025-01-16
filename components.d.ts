@@ -32,6 +32,7 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElTree: typeof import('element-plus/es')['ElTree']
+    ElTreeV2: typeof import('element-plus/es')['ElTreeV2']
     FileReader: typeof import('./src/components/FileReader.vue')['default']
     IconSvg: typeof import('./src/components/IconSvg.vue')['default']
     MarkdownCard: typeof import('./src/components/MarkdownCard.vue')['default']

@@ -3,61 +3,59 @@
     <div class="file-select">
       <el-button plain @click="selectDirectoryFn">选择文件夹</el-button>
     </div>
-    <div v-if="rootFiles.length" class="file-view-content">
+    <div ref="fileViewContent" class="file-view-content">
       <Splitpanes :dbl-click-splitter="false" :push-other-panes="false">
         <Pane size="20" min-size="15">
           <div class="file-view__left">
-            <el-scrollbar>
-              <el-tree
-                class="file-tree"
-                :props="props"
-                :load="loadNode"
-                :icon="ArrowRight"
-                highlight-current
-                node-key="key"
-                lazy
-                :default-expanded-keys="[rootFiles[0].key]"
-                @node-click="fileNodeClickFn"
-              >
-                <template #default="{ node, data }">
-                  <div class="file-tree-node">
-                    <template v-if="data.leaf">
-                      <el-image :src="`./icons/${data.fileIcon}`" alt="file" class="file-icon">
-                        <template #placeholder>
-                          <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
-                        </template>
-                        <template #error>
-                          <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
-                        </template>
-                      </el-image>
-                    </template>
-                    <template v-else>
-                      <el-image
-                        :src="`./icons/${node.expanded ? data.openFolderIcon : data.folderIcon}`"
-                        alt="folder"
-                        class="file-icon"
-                      >
-                        <template #placeholder>
-                          <img
-                            :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
-                            alt="folder"
-                            class="file-icon"
-                          />
-                        </template>
-                        <template #error>
-                          <img
-                            :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
-                            alt="folder"
-                            class="file-icon"
-                          />
-                        </template>
-                      </el-image>
-                    </template>
-                    <div class="file-tree-node-label" :title="node.label">{{ node.label }}</div>
-                  </div>
-                </template>
-              </el-tree>
-            </el-scrollbar>
+            <el-tree-v2
+              ref="fileTreeRef"
+              class="file-tree"
+              :props="props"
+              :icon="ArrowRight"
+              highlight-current
+              node-key="key"
+              @node-click="fileNodeClickFn"
+              :height="fileViewContentHeight"
+              empty-text="请选择文件夹"
+            >
+              <template #default="{ node, data }">
+                <div class="file-tree-node">
+                  <template v-if="data.leaf">
+                    <el-image :src="`./icons/${data.fileIcon}`" alt="file" class="file-icon">
+                      <template #placeholder>
+                        <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                      </template>
+                      <template #error>
+                        <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                      </template>
+                    </el-image>
+                  </template>
+                  <template v-else>
+                    <el-image
+                      :src="`./icons/${node.expanded ? data.openFolderIcon : data.folderIcon}`"
+                      alt="folder"
+                      class="file-icon"
+                    >
+                      <template #placeholder>
+                        <img
+                          :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
+                          alt="folder"
+                          class="file-icon"
+                        />
+                      </template>
+                      <template #error>
+                        <img
+                          :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
+                          alt="folder"
+                          class="file-icon"
+                        />
+                      </template>
+                    </el-image>
+                  </template>
+                  <div class="file-tree-node-label" :title="node.label">{{ node.label }}</div>
+                </div>
+              </template>
+            </el-tree-v2>
           </div>
         </Pane>
         <Pane min-size="30">
@@ -68,7 +66,7 @@
                 :file="currentFile"
                 :imgFileHandles="imgFileHandles"
                 :editorPermission="isEditorPermission"
-                boxHeight="calc(100vh - 128px)"
+                :fileViewContentHeight="fileViewContentHeight"
               />
               <div v-else class="empty">请选择文件</div>
             </div>
@@ -76,40 +74,43 @@
         </Pane>
       </Splitpanes>
     </div>
-    <div v-else class="empty">请先选择文件夹</div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import type Node from 'element-plus/es/components/tree/src/model/node'
+import { nextTick, ref } from 'vue'
+import { useElementSize } from '@vueuse/core'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-icons-js'
 import { ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import FileReader from '@/components/FileReader.vue'
-import { imgFileTypeList } from '@/config/fileConfig'
+import { imgFileTypeList, firstNoLoadDirectory } from '@/config/fileConfig'
+import { ElTreeV2 } from 'element-plus'
+import type { TreeNodeData } from 'element-plus/es/components/tree-v2/src/types.mjs'
 
 const imgFileHandles = ref<FileSystemFileHandle[]>([])
-
-interface Tree {
-  name: string
-  leaf?: boolean
-}
+const fileViewContent = ref<HTMLDivElement | null>()
+const { height: fileViewContentHeight } = useElementSize(fileViewContent)
+const fileTreeRef = ref<typeof ElTreeV2>()
 
 const props = {
-  label: 'name',
-  children: 'children',
-  isLeaf: 'leaf'
+  value: 'key',
+  label: 'label',
+  children: 'children'
 }
 
-interface FileNode extends Tree {
+interface FileNode {
   key: string
+  parentKey: string
+  label: string
+  leaf: boolean
   fileIcon: string | undefined
   folderIcon: string | undefined
   openFolderIcon: string | undefined
   file?: FileSystemDirectoryHandle | FileSystemFileHandle
+  children?: FileNode[]
 }
 
 const defaultFileIcon = getIconForFile('default')
@@ -117,15 +118,7 @@ const defaultFolderIcon = getIconForFolder('default')
 const defaultOpenFolderIcon = getIconForOpenFolder('default')
 const isEditorPermission = ref(false)
 
-const loadNode = async (node: Node, resolve: (data: FileNode[]) => void) => {
-  if (node.level === 0) {
-    return resolve(rootFiles.value)
-  }
-  const fileList = await getFileList(node.data.file as FileSystemDirectoryHandle, node.data.key)
-  resolve(fileList)
-}
-
-const rootFiles = ref<FileNode[]>([])
+let rootFiles: FileNode[] = []
 
 async function selectDirectoryFn() {
   // @ts-ignore
@@ -135,9 +128,10 @@ async function selectDirectoryFn() {
   }
   let dirHandle: FileSystemDirectoryHandle | null = null
   try {
-    rootFiles.value = []
+    rootFiles = []
     currentFile.value = null
     imgFileHandles.value = []
+    fileTreeRef.value?.setData(rootFiles)
     // @ts-ignore
     dirHandle = await window.showDirectoryPicker()
     if (!dirHandle) {
@@ -149,18 +143,23 @@ async function selectDirectoryFn() {
       ElMessage.warning('当前仅有文件访问权限，如需编辑，请授予文件编辑权限')
     }
 
-    rootFiles.value = [
+    rootFiles = [
       {
         key: `/${dirHandle.name}`,
-        name: dirHandle.name,
+        parentKey: '',
+        label: dirHandle.name,
         fileIcon: getFileIcon(dirHandle),
         folderIcon: getIconForFolder(dirHandle.name),
         openFolderIcon: getIconForOpenFolder(dirHandle.name),
         leaf: false,
-        file: dirHandle as FileSystemDirectoryHandle
+        file: dirHandle as FileSystemDirectoryHandle,
+        children: await getFileList(dirHandle as FileSystemDirectoryHandle, `/${(dirHandle as FileSystemDirectoryHandle).name}`)
       }
     ]
-    // rootFiles.value = await getFileList(dirHandle as FileSystemDirectoryHandle, `/${(dirHandle as FileSystemDirectoryHandle).name}`)
+    fileTreeRef.value?.setData(rootFiles)
+    nextTick(() => {
+      fileTreeRef.value?.setExpandedKeys([rootFiles[0].key])
+    })
   } catch (error: any) {
     ElMessage.error(error.message)
   }
@@ -190,28 +189,29 @@ async function verifyPermission(fileHandle: FileSystemDirectoryHandle, withWrite
 
 async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKey: string = '') {
   const currentRankFiles: FileNode[] = []
-  const imgListFileHandle: FileSystemFileHandle[] = []
   // @ts-ignore
   for await (let handelEle of dirHandle.values()) {
     const fileKey = `${parentKey}/${handelEle.name}`
-    currentRankFiles.push({
+    const curObj: FileNode = {
       key: fileKey,
-      name: handelEle.name,
+      parentKey,
+      label: handelEle.name,
       fileIcon: getFileIcon(handelEle),
       folderIcon: getIconForFolder(handelEle.name),
       openFolderIcon: getIconForOpenFolder(handelEle.name),
       leaf: handelEle.kind === 'file',
       file: handelEle as FileSystemFileHandle
-    })
-
-    if (handelEle.kind === 'file') {
-      const fileType = handelEle.name.split('.').pop()
-      if (fileType && imgFileTypeList.includes(fileType)) {
-        imgListFileHandle.push(handelEle as FileSystemFileHandle)
-      }
     }
+    if (handelEle.kind === 'directory') {
+      let children: FileNode[] = []
+      if (!firstNoLoadDirectory.includes(handelEle.name)) {
+        children = await getFileList(handelEle as FileSystemDirectoryHandle, fileKey)
+      }
+      curObj.children = children
+    }
+
+    currentRankFiles.push(curObj)
   }
-  imgFileHandles.value = imgListFileHandle
   // 按照文件夹在前，文件在后排序
   currentRankFiles.sort((a, b) => {
     if (!a.leaf && b.leaf) {
@@ -231,11 +231,31 @@ const getFileIcon = (file: FileSystemDirectoryHandle | FileSystemFileHandle) => 
 }
 
 const currentFile = ref<FileSystemFileHandle | null>(null)
-const fileNodeClickFn = async (data: FileNode) => {
+const fileNodeClickFn = async (data: TreeNodeData) => {
   if (!data.leaf) {
+    if (firstNoLoadDirectory.includes(data.label) && !data.children.length) {
+      const currentFileNode = rootFiles[0].children!.find((item) => item.key === data.key)
+      if (currentFileNode) {
+        const elMessage = ElMessage({
+          showClose: true,
+          message: `正在加载${data.label}目录下的文件...`,
+          duration: 0,
+          type: 'info'
+        })
+        currentFileNode.children = await getFileList(data.file as FileSystemDirectoryHandle, data.key)
+        elMessage.close()
+      }
+    }
+    fileTreeRef.value?.setData(rootFiles)
     return
   }
   currentFile.value = data.file as FileSystemFileHandle
+  const parentNode = fileTreeRef.value?.getNode(data.parentKey!)
+  const imgListFileHandle: FileSystemFileHandle[] = (parentNode.children as TreeNodeData[]).filter((item) => {
+    const fileType = item.label.split('.').pop()
+    return fileType && imgFileTypeList.includes(fileType)
+  }).map(x => x.data.file! as FileSystemFileHandle)
+  imgFileHandles.value = imgListFileHandle || []
 }
 </script>
 

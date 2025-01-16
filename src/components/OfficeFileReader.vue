@@ -1,7 +1,7 @@
 <template>
   <div
     v-loading="loading"
-    :style="{ height: props.boxHeight }"  
+    :style="{ height: `${props.fileViewContentHeight}px` }"  
   >
     <VueOfficeDocx
       class="file-reader-docs"
@@ -50,7 +50,7 @@ import { ElMessage } from 'element-plus'
 const props = defineProps<{
   fileType: string
   fileReader: ArrayBuffer
-  boxHeight: string
+  fileViewContentHeight: number
 }>()
 
 const loading = ref(false)

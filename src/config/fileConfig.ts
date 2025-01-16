@@ -5,3 +5,5 @@ export const codeFileTypeList = ['js', 'cjs', 'mjs', 'ts', 'css', 'scss', 'less'
   'babelrc', 'sample', 'key', 'exclude', 'dev', 'main', 'LICENSE', 'npmignore', 'txt']
 export const officeFileTypeList = ['docx', 'xlsx', 'pdf', 'pptx', 'xls']
 export const videoFileTypeList = ['mp4', 'webm', 'ogg', 'flv', 'mp3']
+
+export const firstNoLoadDirectory = ['node_modules', '.git', '.github', '.vscode']
