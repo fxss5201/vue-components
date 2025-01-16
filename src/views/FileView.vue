@@ -15,45 +15,59 @@
               highlight-current
               node-key="key"
               @node-click="fileNodeClickFn"
+              @node-contextmenu="fileNodeContextmenuFn"
               :height="fileViewContentHeight"
               empty-text="请选择文件夹"
             >
               <template #default="{ node, data }">
-                <div class="file-tree-node">
-                  <template v-if="data.leaf">
-                    <el-image :src="`./icons/${data.fileIcon}`" alt="file" class="file-icon">
-                      <template #placeholder>
-                        <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                <el-popover
+                  placement="right"
+                  title=""
+                  :width="200"
+                  trigger="contextmenu"
+                >
+                  <template #reference>
+                    <div class="file-tree-node">
+                      <template v-if="data.leaf">
+                        <el-image :src="`./icons/${data.fileIcon}`" alt="file" class="file-icon">
+                          <template #placeholder>
+                            <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                          </template>
+                          <template #error>
+                            <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                          </template>
+                        </el-image>
                       </template>
-                      <template #error>
-                        <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
-                      </template>
-                    </el-image>
-                  </template>
-                  <template v-else>
-                    <el-image
-                      :src="`./icons/${node.expanded ? data.openFolderIcon : data.folderIcon}`"
-                      alt="folder"
-                      class="file-icon"
-                    >
-                      <template #placeholder>
-                        <img
-                          :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
+                      <template v-else>
+                        <el-image
+                          :src="`./icons/${node.expanded ? data.openFolderIcon : data.folderIcon}`"
                           alt="folder"
                           class="file-icon"
-                        />
+                        >
+                          <template #placeholder>
+                            <img
+                              :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
+                              alt="folder"
+                              class="file-icon"
+                            />
+                          </template>
+                          <template #error>
+                            <img
+                              :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
+                              alt="folder"
+                              class="file-icon"
+                            />
+                          </template>
+                        </el-image>
                       </template>
-                      <template #error>
-                        <img
-                          :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
-                          alt="folder"
-                          class="file-icon"
-                        />
-                      </template>
-                    </el-image>
+                      <div class="file-tree-node-label" :title="node.label">{{ node.label }}</div>
+                    </div>
                   </template>
-                  <div class="file-tree-node-label" :title="node.label">{{ node.label }}</div>
-                </div>
+                  <template #default>
+                    <div>新增文件</div>
+                    <div>新增文件夹</div>
+                  </template>
+                </el-popover>
               </template>
             </el-tree-v2>
           </div>
@@ -86,9 +100,9 @@ import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-i
 import { ElMessage } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import FileReader from '@/components/FileReader.vue'
-import { imgFileTypeList, firstNoLoadDirectory } from '@/config/fileConfig'
+import { imgFileTypeList, needClickLoadDirectory } from '@/config/fileConfig'
 import { ElTreeV2 } from 'element-plus'
-import type { TreeNodeData } from 'element-plus/es/components/tree-v2/src/types.mjs'
+import type { TreeNode, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types.mjs'
 
 const imgFileHandles = ref<FileSystemFileHandle[]>([])
 const fileViewContent = ref<HTMLDivElement | null>()
@@ -204,7 +218,7 @@ async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKey: stri
     }
     if (handelEle.kind === 'directory') {
       let children: FileNode[] = []
-      if (!firstNoLoadDirectory.includes(handelEle.name)) {
+      if (!needClickLoadDirectory.includes(handelEle.name)) {
         children = await getFileList(handelEle as FileSystemDirectoryHandle, fileKey)
       }
       curObj.children = children
@@ -233,29 +247,29 @@ const getFileIcon = (file: FileSystemDirectoryHandle | FileSystemFileHandle) => 
 const currentFile = ref<FileSystemFileHandle | null>(null)
 const fileNodeClickFn = async (data: TreeNodeData) => {
   if (!data.leaf) {
-    if (firstNoLoadDirectory.includes(data.label) && !data.children.length) {
-      const currentFileNode = rootFiles[0].children!.find((item) => item.key === data.key)
-      if (currentFileNode) {
-        const elMessage = ElMessage({
-          showClose: true,
-          message: `正在加载${data.label}目录下的文件...`,
-          duration: 0,
-          type: 'info'
-        })
-        currentFileNode.children = await getFileList(data.file as FileSystemDirectoryHandle, data.key)
-        elMessage.close()
-      }
+    if (needClickLoadDirectory.includes(data.label) && !data.children.length) {
+      const elMessage = ElMessage({
+        showClose: true,
+        message: `正在加载${data.label}目录下的文件...`,
+        duration: 0,
+        type: 'info'
+      })
+      data.children = await getFileList(data.file as FileSystemDirectoryHandle, data.key)
+      elMessage.close()
     }
     fileTreeRef.value?.setData(rootFiles)
     return
   }
   currentFile.value = data.file as FileSystemFileHandle
   const parentNode = fileTreeRef.value?.getNode(data.parentKey!)
-  const imgListFileHandle: FileSystemFileHandle[] = (parentNode.children as TreeNodeData[]).filter((item) => {
-    const fileType = item.label.split('.').pop()
+  const imgListFileHandle: FileSystemFileHandle[] = (parentNode.children as TreeNode[]).filter((item) => {
+    const fileType = item.label!.split('.').pop()
     return fileType && imgFileTypeList.includes(fileType)
   }).map(x => x.data.file! as FileSystemFileHandle)
   imgFileHandles.value = imgListFileHandle || []
+}
+const fileNodeContextmenuFn = (e: Event, data: TreeNodeData) => {
+  console.log(e, data)
 }
 </script>
 
