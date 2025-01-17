@@ -15,3 +15,7 @@ a,
   fill: currentColor;
   overflow: hidden;
 }
+
+.page-no-top-padding {
+  margin-top: -18px;
+}

@@ -1,24 +1,26 @@
 <template>
-  <MarkdownCard :content="NoticeBarMd" />
-  <NoticeBar
-    @leftClick="leftClickFn"
-    @rightClick="rightClickFn"
-    @scrollStart="scrollStartFn"
-    @scrollEnd="scrollEndFn"
-    @canScrollChange="canScrollChangeFn"
-    rightText="更多"
-    :rightIcon="ArrowRight">
-    <div class="notice-list">
-      <div v-for="item in list" :key="item.id" @click="itemClickFn(item)" class="notice-item">
-        <div class="notice-item-dot"></div>
-        <div class="notice-item-text">{{ item.name }}</div>
+  <div class="page-no-top-padding">
+    <MarkdownCard :content="NoticeBarMd" />
+    <NoticeBar
+      @leftClick="leftClickFn"
+      @rightClick="rightClickFn"
+      @scrollStart="scrollStartFn"
+      @scrollEnd="scrollEndFn"
+      @canScrollChange="canScrollChangeFn"
+      rightText="更多"
+      :rightIcon="ArrowRight">
+      <div class="notice-list">
+        <div v-for="item in list" :key="item.id" @click="itemClickFn(item)" class="notice-item">
+          <div class="notice-item-dot"></div>
+          <div class="notice-item-text">{{ item.name }}</div>
+        </div>
       </div>
-    </div>
-    <!-- <template #right>
-      <div class="notice-right-text">更多</div>
-      <el-icon><ArrowRight /></el-icon>
-    </template> -->
-  </NoticeBar>
+      <!-- <template #right>
+        <div class="notice-right-text">更多</div>
+        <el-icon><ArrowRight /></el-icon>
+      </template> -->
+    </NoticeBar>
+  </div>
 </template>
 
 <script lang="ts" setup>

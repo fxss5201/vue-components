@@ -34,6 +34,7 @@
       </div>
       <div
         class="layout-main"
+        ref="layoutMainRef"
         :style="{ backgroundColor: (route.meta?.backgroundColor as string) ?? '#fff' }"
       >
         <RouterView v-slot="{ Component }">
@@ -53,6 +54,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { Fold, Expand } from '@element-plus/icons-vue'
 import AsideComponent from '@/layout/AsideComponent.vue'
@@ -73,8 +75,10 @@ router.beforeEach((to, from, next) => {
   startNProgress()
   next()
 })
+const layoutMainRef = ref<HTMLDivElement>()
 router.afterEach((to, from) => {
   document.title = `${to.meta.title as string} | vue-components`
+  layoutMainRef.value!.scrollTo(0, 0)
   doneNProgress()
 })
 </script>
@@ -101,7 +105,7 @@ router.afterEach((to, from) => {
   }
 }
 .layout-content {
-  height: calc(100vh - 60px);
+  height: calc(100vh - 61px);
   display: flex;
   align-items: stretch;
 }

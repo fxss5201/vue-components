@@ -278,9 +278,12 @@ const fileNodeContextmenuFn = (e: Event, data: TreeNodeData) => {
   margin: 16px 0;
   text-align: center;
 }
+.file-view {
+  height: 100%;
+}
 .file-view-content {
   width: 100%;
-  height: calc(100vh - 128px);
+  height: calc(100% - 32px);
 }
 .file-view__left,
 .file-view__right {

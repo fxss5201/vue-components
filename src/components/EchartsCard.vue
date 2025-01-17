@@ -1,17 +1,17 @@
 <template>
-  <div ref="echartsRef" style="width: 100%; height: 100%"></div>
+  <div ref="echartsRef" style="width: 100%; height: 100%" class="echarts-box"></div>
 </template>
 
 <script lang="ts" setup>
 import * as echarts from 'echarts'
-import { nextTick, ref, onMounted, onUnmounted, watch } from 'vue'
-import { useDebounceFn, useResizeObserver } from '@vueuse/core'
+import { nextTick, ref, onMounted, onBeforeUnmount, watch, markRaw } from 'vue'
+import { useDebounceFn, useResizeObserver, useParentElement } from '@vueuse/core'
 
 const props = withDefaults(
   defineProps<{
-    opts: echarts.EChartsInitOpts,
-    options: any,
-    addEvent: boolean
+    opts?: echarts.EChartsInitOpts,
+    options: echarts.EChartsOption,
+    addEvent?: boolean
   }>(),
   {
     // https://echarts.apache.org/zh/api.html#echarts.init
@@ -21,7 +21,9 @@ const props = withDefaults(
         renderer: 'canvas'
       }
     },
-    options: () => {},
+    options: () => {
+      return {} as echarts.EChartsOption
+    },
     addEvent: false
   }
 )
@@ -34,13 +36,20 @@ const echartsInstance = ref<echarts.ECharts | null>()
 const debouncedFn = useDebounceFn(() => {
   resizeEchart()
 }, 200, { maxWait: 800 })
+
+const parentEl = useParentElement()
 useResizeObserver(echartsRef, () => {
-  debouncedFn()
+  // 如果是 ResizeCard 组件，需要调用 resizeEchart 方法
+  if (parentEl.value!.classList.contains('resize-card')) {
+    resizeEchart()
+  } else {
+    debouncedFn()
+  }
 })
 onMounted(() => {
   initEchart()
 })
-onUnmounted(() => {
+onBeforeUnmount(() => {
   destroyEchart()
 })
 watch(
@@ -55,8 +64,9 @@ watch(
 
 function initEchart () {
   destroyEchart()
-  echartsInstance.value = echarts.init(echartsRef.value, null, props.opts)
+  echartsInstance.value = markRaw(echarts.init(echartsRef.value, null, props.opts))
   updateEchart()
+  setTooltipScrollConfig()
   if (props.addEvent) {
     addClickEventFn()
   }
@@ -76,11 +86,13 @@ function destroyEchart () {
 function updateEchart () {
   nextTick(() => {
     echartsInstance.value?.setOption(props.options, true)
+    setTooltipScrollConfig()
   })
 }
 
 function resizeEchart () {
   echartsInstance.value?.resize()
+  setTooltipScrollConfig()
 }
 
 function addClickEventFn () {
@@ -93,4 +105,44 @@ function addClickEventFn () {
 function removeClickEventFn () {
   echartsInstance.value?.off('click')
 }
+
+// 解决 tooltip 超出 echarts 容器问题
+function setTooltipScrollConfig () {
+  nextTick(() => {
+    if (props.options && props.options.tooltip) {
+      let chartBoxHeight = 200
+      if (echartsRef.value) {
+        chartBoxHeight = echartsRef.value.clientHeight
+      }
+      const tooltipConfig = {
+        tooltip: {
+          confine: true,
+          enterable: true,
+          extraCssText: `max-height: ${chartBoxHeight}px;max-width: 380px;overflow: auto;box-sizing: border-box;`
+        }
+      }
+      echartsInstance.value?.setOption(tooltipConfig)
+    }
+  })
+}
 </script>
+
+<style lang="scss">
+.echarts-box {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px;
+    background-color: #fff;
+  }
+  ::-webkit-scrollbar-track-piece {
+    background-color: #efefef;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    box-shadow: inset 0 0 6px #ccc;
+  }
+}
+</style>

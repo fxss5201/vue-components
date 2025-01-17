@@ -1,17 +1,19 @@
 <template>
-  <MarkdownCard :content="ResizeCardMd" />
-  <div style="height: 10000px;">
-    <ResizeCard
-      :isResize="form.isResize"
-      @resize="resizeFn">
-      <div style="padding: 16px;">
-        <el-form :model="form" label-width="auto">
-          <el-form-item label="是否可改变大小" prop="length">
-            <el-checkbox v-model="form.isResize" />
-          </el-form-item>
-        </el-form>
-      </div>
-    </ResizeCard>
+  <div class="page-no-top-padding">
+    <MarkdownCard :content="ResizeCardMd" />
+    <div style="height: 10000px;">
+      <ResizeCard
+        :isResize="form.isResize"
+        @resize="resizeFn">
+        <div style="padding: 16px;">
+          <el-form :model="form" label-width="auto">
+            <el-form-item label="是否可改变大小" prop="length">
+              <el-checkbox v-model="form.isResize" />
+            </el-form-item>
+          </el-form>
+        </div>
+      </ResizeCard>
+    </div>
   </div>
 </template>
 

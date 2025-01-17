@@ -1,67 +1,69 @@
 <template>
-  <MarkdownCard :content="TooltipViewMd" />
-  <ResizeCard class="resize-box" :default-height="250">
-    <div class="list-box">
-      <div class="list-item" v-for="item in list" :key="item.id">
-        <div class="item-left">
-          <el-tooltip
-            effect="dark"
-            :content="item.title"
-            placement="top-start"
-            :disabled="tooltipDisabled"
-          >
-            <div class="item-title" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
-              {{ item.title }}
-            </div>
-          </el-tooltip>
-          <el-tooltip
-            effect="dark"
-            :content="item.content"
-            placement="top-start"
-            :disabled="tooltipDisabled"
-          >
-            <div class="item-content" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
-              {{ item.content }}
-            </div>
-          </el-tooltip>
-        </div>
-        <div class="item-right">
-          <div class="item-tag">{{ item.tag }}</div>
-        </div>
-      </div>
-    </div>
-  </ResizeCard>
-  <ResizeCard class="resize-box" @resize="handleResize" :autoWatchScroll="false" :is-scroll="resizeCardIsScroll" style="margin-top: 16px;">
-    <div class="list-box" ref="listBox" style="height: 100%;overflow-y: auto;">
-      <div class="list-item" v-for="item in list" :key="item.id">
-        <div class="item-left">
-          <el-tooltip
-            effect="dark"
-            :content="item.title"
-            placement="top-start"
-            :disabled="tooltipDisabled"
-          >
-            <div class="item-title" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
-              {{ item.title }}
-            </div>
-          </el-tooltip>
-          <el-tooltip
-            effect="dark"
-            :content="item.content"
-            placement="top-start"
-            :disabled="tooltipDisabled"
-          >
-            <div class="item-content" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
-              {{ item.content }}
-            </div>
-          </el-tooltip>
-        </div>
-        <div class="item-right">
-          <div class="item-tag">{{ item.tag }}</div>
+  <div class="page-no-top-padding">
+    <MarkdownCard :content="TooltipViewMd" />
+    <ResizeCard class="resize-box" :default-height="250">
+      <div class="list-box">
+        <div class="list-item" v-for="item in list" :key="item.id">
+          <div class="item-left">
+            <el-tooltip
+              effect="dark"
+              :content="item.title"
+              placement="top-start"
+              :disabled="tooltipDisabled"
+            >
+              <div class="item-title" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
+                {{ item.title }}
+              </div>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="item.content"
+              placement="top-start"
+              :disabled="tooltipDisabled"
+            >
+              <div class="item-content" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
+                {{ item.content }}
+              </div>
+            </el-tooltip>
+          </div>
+          <div class="item-right">
+            <div class="item-tag">{{ item.tag }}</div>
+          </div>
         </div>
       </div>
-    </div>
-  </ResizeCard>
+    </ResizeCard>
+    <ResizeCard class="resize-box" @resize="handleResize" :autoWatchScroll="false" :is-scroll="resizeCardIsScroll" style="margin-top: 16px;">
+      <div class="list-box" ref="listBox" style="height: 100%;overflow-y: auto;">
+        <div class="list-item" v-for="item in list" :key="item.id">
+          <div class="item-left">
+            <el-tooltip
+              effect="dark"
+              :content="item.title"
+              placement="top-start"
+              :disabled="tooltipDisabled"
+            >
+              <div class="item-title" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
+                {{ item.title }}
+              </div>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="item.content"
+              placement="top-start"
+              :disabled="tooltipDisabled"
+            >
+              <div class="item-content" @mouseenter="mouseenterFn" @mouseleave="mouseleaveFn">
+                {{ item.content }}
+              </div>
+            </el-tooltip>
+          </div>
+          <div class="item-right">
+            <div class="item-tag">{{ item.tag }}</div>
+          </div>
+        </div>
+      </div>
+    </ResizeCard>
+  </div>
 </template>
 
 <script lang="ts" setup>

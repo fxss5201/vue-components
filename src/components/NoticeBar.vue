@@ -46,7 +46,7 @@
 
 <script lang="ts" setup>
 import type { Component, CSSProperties } from 'vue'
-import { computed, ref, onMounted, nextTick, onUpdated } from 'vue'
+import { computed, ref, onMounted, nextTick, onUpdated, onBeforeUnmount } from 'vue'
 import IconSvg from '@/components/IconSvg.vue'
 import { useDebounceFn, useResizeObserver } from '@vueuse/core'
 
@@ -100,6 +100,10 @@ onUpdated(() => {
   })
 })
 
+onBeforeUnmount(() => {
+  doCancleScrollFn()
+})
+
 const noticeBarRef = ref<HTMLDivElement>()
 const debouncedFn = useDebounceFn(() => {
   doCancleScrollFn()
@@ -125,7 +129,7 @@ function doScrollFn () {
           emits('scrollStart')
         })
       }
-      scrollbarRef.value.setScrollLeft(scrollValue.value)
+      scrollbarRef.value?.setScrollLeft(scrollValue.value)
       if (isScroll.value) {
         scrollTimer.value = window.requestAnimationFrame(scrollFn)
       } else {
@@ -136,7 +140,7 @@ function doScrollFn () {
       }
     }
     emits('scrollStart')
-    window.requestAnimationFrame(scrollFn)
+    scrollFn()
   
     mouseenterFn.value = () => {
       isScroll.value = false
@@ -145,7 +149,7 @@ function doScrollFn () {
     mouseleaveFn.value = () => {
       scrollValue.value = noticeBarWrap.scrollLeft
       isScroll.value = true
-      window.requestAnimationFrame(scrollFn)
+      scrollFn()
     }
     noticeBarBox.addEventListener('mouseleave', mouseleaveFn.value)
   }
