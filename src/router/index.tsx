@@ -108,7 +108,8 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../views/FileView.vue'),
     meta: {
       title: '文件预览',
-      icon: <Notebook />
+      icon: <Notebook />,
+      noPadding: true
     }
   },
   {

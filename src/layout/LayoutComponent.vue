@@ -35,7 +35,10 @@
       <div
         class="layout-main"
         ref="layoutMainRef"
-        :style="{ backgroundColor: (route.meta?.backgroundColor as string) ?? '#fff' }"
+        :style="{
+          backgroundColor: (route.meta?.backgroundColor as string) ?? '#fff',
+          padding: (route.meta?.noPadding as boolean) ? '0' : '18px'
+        }"
       >
         <RouterView v-slot="{ Component }">
           <template v-if="Component">

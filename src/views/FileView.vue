@@ -25,6 +25,7 @@
                   title=""
                   :width="200"
                   trigger="contextmenu"
+                  popper-style="padding: 0;"
                 >
                   <template #reference>
                     <div class="file-tree-node">
@@ -64,8 +65,10 @@
                     </div>
                   </template>
                   <template #default>
-                    <div>新增文件</div>
-                    <div>新增文件夹</div>
+                    <ButtonList
+                      :list="directoryContextmenuList"
+                      @click="buttonListClickFn"
+                    />
                   </template>
                 </el-popover>
               </template>
@@ -103,6 +106,8 @@ import FileReader from '@/components/FileReader.vue'
 import { imgFileTypeList, needClickLoadDirectory } from '@/config/fileConfig'
 import { ElTreeV2 } from 'element-plus'
 import type { TreeNode, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types.mjs'
+import ButtonList from '@/components/ButtonList.vue'
+import type { ButtonItemProps } from '@/types/ButtonItemProps.ts'
 
 const imgFileHandles = ref<FileSystemFileHandle[]>([])
 const fileViewContent = ref<HTMLDivElement | null>()
@@ -268,8 +273,52 @@ const fileNodeClickFn = async (data: TreeNodeData) => {
   }).map(x => x.data.file! as FileSystemFileHandle)
   imgFileHandles.value = imgListFileHandle || []
 }
+
+let currentContextmenuDirectory: FileNode | null = null
 const fileNodeContextmenuFn = (e: Event, data: TreeNodeData) => {
   console.log(e, data)
+  currentContextmenuDirectory = data as FileNode
+}
+const directoryContextmenuList = ref<ButtonItemProps[]>([
+  {
+    key: 'addFile',
+    name: '新增文件'
+  },
+  {
+    key: 'addFolder',
+    name: '新增文件夹'
+  }
+])
+const buttonListClickFn = (item: ButtonItemProps) => {
+  if (item.key === 'addFile') {
+    addFileFn()
+  }
+  // else if (item.key === 'addFolder') {
+  //   addFolderFn()
+  // }
+}
+const addFileFn = async () => {
+  if (!currentContextmenuDirectory) {
+    return
+  }
+  // @ts-ignore
+  const fileHandle: FileSystemFileHandle = await currentContextmenuDirectory.file?.getFileHandle('newFile.txt', {
+    create: true
+  })
+  const fileNode: FileNode = {
+    key: `${currentContextmenuDirectory.key}/newFile.txt`,
+    parentKey: currentContextmenuDirectory.key,
+    label: 'newFile.txt',
+    fileIcon: getFileIcon(fileHandle),
+    folderIcon: getIconForFolder('default'),
+    openFolderIcon: getIconForOpenFolder('default'),
+    leaf: true,
+    file: fileHandle
+  }
+  currentFile.value = fileHandle as FileSystemFileHandle
+  (currentContextmenuDirectory as FileNode | null)?.children?.push(fileNode)
+  currentContextmenuDirectory = null
+  fileTreeRef.value?.setData(rootFiles)
 }
 </script>
 

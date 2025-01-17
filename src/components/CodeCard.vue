@@ -167,6 +167,12 @@ watch(
   line-height: 1.5;
   border-radius: 6px;
   font-family: DM Mono,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    font-weight: normal;
+  }
 
   .code-card-tool {
     position: absolute;

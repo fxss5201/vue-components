@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ButtonList: typeof import('./src/components/ButtonList.vue')['default']
     CalendarMonth: typeof import('./src/components/Calendar/CalendarMonth.vue')['default']
     CalendarYear: typeof import('./src/components/Calendar/CalendarYear.vue')['default']
     CodeCard: typeof import('./src/components/CodeCard.vue')['default']
