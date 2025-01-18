@@ -1,10 +1,8 @@
 <template>
-  <div class="file-view">
-    <div class="file-select">
-      <el-button plain @click="selectDirectoryFn">选择文件夹</el-button>
-    </div>
+  <div class="file-view" ref="fileViewRef">
+    <FileMenu class="file-head" @selectDirectory="selectDirectoryFn"></FileMenu>
     <div ref="fileViewContent" class="file-view-content">
-      <Splitpanes :dbl-click-splitter="false" :push-other-panes="false">
+      <Splitpanes :dbl-click-splitter="false" :push-other-panes="false" class="file-view-Splitpanes">
         <Pane size="20" min-size="15">
           <div class="file-view__left">
             <el-tree-v2
@@ -20,57 +18,41 @@
               empty-text="请选择文件夹"
             >
               <template #default="{ node, data }">
-                <el-popover
-                  placement="right"
-                  title=""
-                  :width="200"
-                  trigger="contextmenu"
-                  popper-style="padding: 0;"
-                >
-                  <template #reference>
-                    <div class="file-tree-node">
-                      <template v-if="data.leaf">
-                        <el-image :src="`./icons/${data.fileIcon}`" alt="file" class="file-icon">
-                          <template #placeholder>
-                            <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
-                          </template>
-                          <template #error>
-                            <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
-                          </template>
-                        </el-image>
+                <div class="file-tree-node">
+                  <template v-if="data.leaf">
+                    <el-image :src="`./icons/${data.fileIcon}`" alt="file" class="file-icon">
+                      <template #placeholder>
+                        <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
                       </template>
-                      <template v-else>
-                        <el-image
-                          :src="`./icons/${node.expanded ? data.openFolderIcon : data.folderIcon}`"
+                      <template #error>
+                        <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                      </template>
+                    </el-image>
+                  </template>
+                  <template v-else>
+                    <el-image
+                      :src="`./icons/${node.expanded ? data.openFolderIcon : data.folderIcon}`"
+                      alt="folder"
+                      class="file-icon"
+                    >
+                      <template #placeholder>
+                        <img
+                          :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
                           alt="folder"
                           class="file-icon"
-                        >
-                          <template #placeholder>
-                            <img
-                              :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
-                              alt="folder"
-                              class="file-icon"
-                            />
-                          </template>
-                          <template #error>
-                            <img
-                              :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
-                              alt="folder"
-                              class="file-icon"
-                            />
-                          </template>
-                        </el-image>
+                        />
                       </template>
-                      <div class="file-tree-node-label" :title="node.label">{{ node.label }}</div>
-                    </div>
+                      <template #error>
+                        <img
+                          :src="`./icons/${node.expanded ? defaultOpenFolderIcon : defaultFolderIcon}`"
+                          alt="folder"
+                          class="file-icon"
+                        />
+                      </template>
+                    </el-image>
                   </template>
-                  <template #default>
-                    <ButtonList
-                      :list="directoryContextmenuList"
-                      @click="buttonListClickFn"
-                    />
-                  </template>
-                </el-popover>
+                  <div class="file-tree-node-label" :title="node.label">{{ node.label }}</div>
+                </div>
               </template>
             </el-tree-v2>
           </div>
@@ -91,6 +73,13 @@
         </Pane>
       </Splitpanes>
     </div>
+
+    <FileAdd
+      v-if="fileAddVisible"
+      :visible="fileAddVisible"
+      :fileNode="(currentContextmenuDirectory as FileNode)"
+      @close="fileAddCloseFn"
+      @confirm="fuleAddConfirmFn"></FileAdd>
   </div>
 </template>
 
@@ -100,15 +89,16 @@ import { useElementSize } from '@vueuse/core'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-icons-js'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElTreeV2 } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import FileReader from '@/components/FileReader.vue'
 import { imgFileTypeList, needClickLoadDirectory } from '@/config/fileConfig'
-import { ElTreeV2 } from 'element-plus'
 import type { TreeNode, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types.mjs'
-import ButtonList from '@/components/ButtonList.vue'
-import type { ButtonItemProps } from '@/types/ButtonItemProps.ts'
+import FileMenu from './components/FileMenu.vue'
+import FileAdd from './components/FileAdd.vue'
+import type { FileNode, FileAddForm } from '@/types/fileView'
 
+const fileViewRef = ref<HTMLDivElement>()
 const imgFileHandles = ref<FileSystemFileHandle[]>([])
 const fileViewContent = ref<HTMLDivElement | null>()
 const { height: fileViewContentHeight } = useElementSize(fileViewContent)
@@ -118,18 +108,6 @@ const props = {
   value: 'key',
   label: 'label',
   children: 'children'
-}
-
-interface FileNode {
-  key: string
-  parentKey: string
-  label: string
-  leaf: boolean
-  fileIcon: string | undefined
-  folderIcon: string | undefined
-  openFolderIcon: string | undefined
-  file?: FileSystemDirectoryHandle | FileSystemFileHandle
-  children?: FileNode[]
 }
 
 const defaultFileIcon = getIconForFile('default')
@@ -274,51 +252,62 @@ const fileNodeClickFn = async (data: TreeNodeData) => {
   imgFileHandles.value = imgListFileHandle || []
 }
 
-let currentContextmenuDirectory: FileNode | null = null
+let currentContextmenuDirectory = ref<FileNode | null>(null)
 const fileNodeContextmenuFn = (e: Event, data: TreeNodeData) => {
   console.log(e, data)
-  currentContextmenuDirectory = data as FileNode
-}
-const directoryContextmenuList = ref<ButtonItemProps[]>([
-  {
-    key: 'addFile',
-    name: '新增文件'
-  },
-  {
-    key: 'addFolder',
-    name: '新增文件夹'
-  }
-])
-const buttonListClickFn = (item: ButtonItemProps) => {
-  if (item.key === 'addFile') {
-    addFileFn()
-  }
-  // else if (item.key === 'addFolder') {
-  //   addFolderFn()
-  // }
-}
-const addFileFn = async () => {
-  if (!currentContextmenuDirectory) {
+  if (data.leaf) {
     return
   }
-  // @ts-ignore
-  const fileHandle: FileSystemFileHandle = await currentContextmenuDirectory.file?.getFileHandle('newFile.txt', {
-    create: true
-  })
-  const fileNode: FileNode = {
-    key: `${currentContextmenuDirectory.key}/newFile.txt`,
-    parentKey: currentContextmenuDirectory.key,
-    label: 'newFile.txt',
-    fileIcon: getFileIcon(fileHandle),
-    folderIcon: getIconForFolder('default'),
-    openFolderIcon: getIconForOpenFolder('default'),
-    leaf: true,
-    file: fileHandle
+  currentContextmenuDirectory.value = data as FileNode
+  fileAddVisible.value = true
+}
+
+const addFileFn = async (ruleForm: FileAddForm) => {
+  if (!currentContextmenuDirectory.value) {
+    return
   }
-  currentFile.value = fileHandle as FileSystemFileHandle
-  (currentContextmenuDirectory as FileNode | null)?.children?.push(fileNode)
-  currentContextmenuDirectory = null
+  let fileName = ''
+  let fileHandle: FileSystemFileHandle | FileSystemDirectoryHandle | null = null
+  if (ruleForm.type === 'file') {
+    fileName = `${ruleForm.name}.${ruleForm.fileType}`
+    // @ts-ignore
+    fileHandle = await currentContextmenuDirectory.value.file?.getFileHandle(fileName, {
+      create: true
+    })
+  } else {
+    fileName = `${ruleForm.name}`
+    // @ts-ignore
+    fileHandle = await currentContextmenuDirectory.value.file?.getDirectoryHandle(fileName, {
+      create: true
+    })
+  }
+  const fileNode: FileNode = {
+    key: `${currentContextmenuDirectory.value.key}/${fileName}`,
+    parentKey: currentContextmenuDirectory.value.key,
+    label: fileName,
+    fileIcon: getFileIcon(fileHandle!),
+    folderIcon: getIconForFolder(fileHandle!.name),
+    openFolderIcon: getIconForOpenFolder(fileHandle!.name),
+    leaf: ruleForm.type === 'file',
+    file: fileHandle!
+  }
+  if (ruleForm.type === 'file') {
+    currentFile.value = fileHandle as FileSystemFileHandle
+  } else {
+    fileNode.children = []
+  }
+  (currentContextmenuDirectory.value as FileNode | null)?.children?.push(fileNode)
   fileTreeRef.value?.setData(rootFiles)
+}
+
+const fileAddVisible = ref(false)
+function fileAddCloseFn() {
+  fileAddVisible.value = false
+}
+async function fuleAddConfirmFn(ruleForm: FileAddForm) {
+  await addFileFn(ruleForm)
+  currentContextmenuDirectory.value = null
+  fileAddVisible.value = false
 }
 </script>
 
@@ -329,10 +318,19 @@ const addFileFn = async () => {
 }
 .file-view {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background-color: #fff;
+
+  .file-head {
+    flex-shrink: 0;
+  }
 }
 .file-view-content {
+  flex: auto;
   width: 100%;
-  height: calc(100% - 32px);
+  min-height: 0;
 }
 .file-view__left,
 .file-view__right {
@@ -341,7 +339,7 @@ const addFileFn = async () => {
   overflow: hidden;
 }
 .file-view-body {
-  margin-left: 16px;
+  width: 100%;
   height: 100%;
 }
 </style>
@@ -384,6 +382,12 @@ const addFileFn = async () => {
   }
   .el-tree__empty-text {
     color: var(--color-text);
+  }
+}
+.file-view-Splitpanes {
+  height: 100%;
+  .splitpanes__pane {
+    height: 100%;
   }
 }
 </style>
