@@ -382,5 +382,8 @@ const addFileFn = async () => {
       }
     }
   }
+  .el-tree__empty-text {
+    color: var(--color-text);
+  }
 }
 </style>
