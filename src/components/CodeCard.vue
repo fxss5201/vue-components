@@ -103,6 +103,12 @@ const borderColorStyle = ref('rgba(225, 228, 232, 0.5)')
 const bgColorStyle = ref('#24292e')
 
 const codeLines = computed(() => {
+  if (!props.lineNumbers) {
+    return []
+  }
+  if (typeof model.value !== 'string') {
+    return []
+  }
   const lines = model.value.split('\n')
   return lines.map((_, i) => i + 1)
 })

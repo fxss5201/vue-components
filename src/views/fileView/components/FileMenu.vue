@@ -1,10 +1,19 @@
 <template>
   <div class="file-menu">
     <div class="file-menu-left">
-      <el-button @click="selectDirectoryFn" text size="large">选择文件夹</el-button>
+      <el-dropdown placement="bottom-start" trigger="click" @command="handleCommandFn">
+        <el-button text size="large">文件</el-button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="selectDirectory">选择文件夹</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
     <div class="file-menu-right">
-      <el-button text size="large" :icon="FullScreen" :title="isFullscreen ? '退出全屏' : '全屏'" @click="toggleFullscreenFn"></el-button>
+      <!-- <el-tooltip :content="isFullscreen ? '退出全屏' : '全屏'" placement="bottom-end" effect="light">
+        <el-button text size="large" :icon="FullScreen" @click="toggleFullscreenFn"></el-button>
+      </el-tooltip> -->
     </div>
   </div>
 </template>
@@ -27,8 +36,10 @@ const toggleFullscreenFn = () => {
 
 const emit = defineEmits(['selectDirectory'])
 
-const selectDirectoryFn = () => {
-  emit('selectDirectory')
+const handleCommandFn = (command: string) => {
+  if (command === 'selectDirectory') {
+    emit(command)
+  }
 }
 </script>
 
