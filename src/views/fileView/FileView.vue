@@ -10,6 +10,7 @@
         </Pane>
         <Pane min-size="30">
           <div class="file-view__right">
+            <FileTabs @changeFile="changeFileFn"></FileTabs>
             <FileBody></FileBody>
           </div>
         </Pane>
@@ -27,6 +28,7 @@ import 'splitpanes/dist/splitpanes.css'
 import FileMenu from './components/FileMenu.vue'
 import FileBody from './components/FileBody.vue'
 import FileTree from './components/FileTree.vue'
+import FileTabs from './components/FileTabs.vue'
 
 import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
 import { rootFiles, useFileTreeStore } from '@/stores/fileView/fileTreeStore'
@@ -54,6 +56,10 @@ async function selectDirectoryFn() {
   nextTick(() => {
     fileTreeRef.value?.elTreeRef.setExpandedKeys([rootFiles[0].key])
   })
+}
+
+function changeFileFn (key: string) {
+  fileTreeRef.value?.elTreeRef.setCurrentKey(key)
 }
 </script>
 

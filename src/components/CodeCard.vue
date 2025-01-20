@@ -22,7 +22,14 @@
       </div>
       <div ref="codeContentRef" class="code-content">
         <div ref="codeBodyRef" class="code-body">
-          <textarea v-if="props.isEditor" ref="textareaRef" class="code-input" v-model="model" v-on-key-stroke:c,s="onSaveFileFn" spellcheck="false"></textarea>
+          <textarea
+            v-if="props.isEditor"
+            ref="textareaRef"
+            class="code-input"
+            v-model="model"
+            v-on-key-stroke:c,s="onSaveFileFn"
+            spellcheck="false"
+          ></textarea>
           <div class="code-text"
             :style="{ paddingBottom: props.isEditor ? '21px' : 0 }">
             <pre :class="[isVue ? 'shiki github-dark' : 'hljs']" :style="[isVue ? 'background-color:#24292e;color:#e1e4e8' : '']"><code ref="codeRef" v-html="codeHtml"></code></pre>

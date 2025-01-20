@@ -8,7 +8,7 @@ export const useFileViewLayoutStore = defineStore('fileViewLayoutStore', () => {
   }
 
   const fileReaderHeight = computed(() => {
-    return fileViewContentHeight.value
+    return fileViewContentHeight.value - 40
   })
 
   return {

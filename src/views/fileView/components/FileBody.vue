@@ -1,25 +1,20 @@
 <template>
   <div class="file-view-body">
     <FileReader
-      v-if="currentFile"
-      :file="currentFile"
-      :imgFileHandles="imgFileHandles"
-      :editorPermission="editorPermission"
-      :fileReaderHeight="fileReaderHeight"
+      v-if="fileTabsValue"
     />
     <div v-else class="empty">请选择文件</div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia'
-import { useCurrentFileStore } from '@/stores/fileView/currentFileStore'
-import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
 import FileReader from '@/views/fileView/components/FileReader.vue'
 
-const currentFileStore = useCurrentFileStore()
-const { currentFile, imgFileHandles, editorPermission } = storeToRefs(currentFileStore)
-const { fileReaderHeight } = storeToRefs(useFileViewLayoutStore())
+import { storeToRefs } from 'pinia'
+import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
+
+const fileTabsStore = useFileTabsStore()
+const { fileTabsValue } = storeToRefs(fileTabsStore)
 </script>
 
 <style lang="scss" scoped>

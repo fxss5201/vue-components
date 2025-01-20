@@ -64,20 +64,20 @@ import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-i
 
 import { ArrowRight } from '@element-plus/icons-vue'
 import { ElMessage, ElTreeV2 } from 'element-plus'
-import type { TreeNode, TreeNodeData } from 'element-plus/es/components/tree-v2/src/types.mjs'
+import type { TreeNodeData } from 'element-plus/es/components/tree-v2/src/types.mjs'
 
 import FileAdd from './FileAdd.vue'
 import type { FileNode, FileAddForm } from '@/types/fileView'
 
 import { storeToRefs } from 'pinia'
-import { useCurrentFileStore } from '@/stores/fileView/currentFileStore'
 import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
 import { rootFiles, getFileList, getFileIcon } from '@/stores/fileView/fileTreeStore'
+import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 
-import { imgFileTypeList, needClickLoadDirectory } from '@/config/fileConfig'
+import { needClickLoadDirectory } from '@/config/fileConfig'
 
-const { setCurrentFile, setImgFileHandles } = useCurrentFileStore()
 const { fileViewContentHeight } = storeToRefs(useFileViewLayoutStore())
+const { addFileTab } = useFileTabsStore()
 
 const elTreeRef = ref<typeof ElTreeV2>()
 defineExpose({
@@ -109,13 +109,8 @@ const fileNodeClickFn = async (data: TreeNodeData) => {
     elTreeRef.value?.setData(rootFiles)
     return
   }
-  setCurrentFile(data.file as FileSystemFileHandle)
-  const parentNode = elTreeRef.value?.getNode(data.parentKey!)
-  const imgListFileHandle: FileSystemFileHandle[] = (parentNode.children as TreeNode[]).filter((item) => {
-    const fileType = item.label!.split('.').pop()
-    return fileType && imgFileTypeList.includes(fileType)
-  }).map(x => x.data.file! as FileSystemFileHandle)
-  setImgFileHandles(imgListFileHandle || [])
+  addFileTab(data as FileNode)
+  elTreeRef.value?.setCurrentKey(data.key)
 }
 
 let currentContextmenuDirectory = ref<FileNode | null>(null)
@@ -147,8 +142,9 @@ const addFileFn = async (ruleForm: FileAddForm) => {
       create: true
     })
   }
+  const fileNodeKey = `${currentContextmenuDirectory.value.key}/${fileName}`
   const fileNode: FileNode = {
-    key: `${currentContextmenuDirectory.value.key}/${fileName}`,
+    key: fileNodeKey,
     parentKey: currentContextmenuDirectory.value.key,
     label: fileName,
     fileIcon: getFileIcon(fileHandle!),
@@ -158,12 +154,13 @@ const addFileFn = async (ruleForm: FileAddForm) => {
     file: fileHandle!
   }
   if (ruleForm.type === 'file') {
-    setCurrentFile(fileHandle as FileSystemFileHandle)
+    addFileTab(fileNode as FileNode)
   } else {
     fileNode.children = []
   }
   (currentContextmenuDirectory.value as FileNode | null)?.children?.push(fileNode)
   elTreeRef.value?.setData(rootFiles)
+  elTreeRef.value?.setCurrentKey(fileNodeKey)
 }
 
 const fileAddVisible = ref(false)

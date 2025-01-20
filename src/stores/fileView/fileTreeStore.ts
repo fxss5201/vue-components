@@ -1,19 +1,25 @@
 import { defineStore } from 'pinia'
 import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-icons-js'
-import type { FileNode } from '@/types/fileView'
 import { ElMessage } from 'element-plus'
+
 import { useCurrentFileStore } from '@/stores/fileView/currentFileStore'
-import { needClickLoadDirectory } from '@/config/fileConfig'
+import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
+
+import { needClickLoadDirectory, imgFileTypeList } from '@/config/fileConfig'
+import type { FileNode } from '@/types/fileView'
 
 export let rootFiles: FileNode[] = []
 
 export const useFileTreeStore = defineStore('fileTreeStore', () => {
   const { setCurrentFile, setImgFileHandles, setEditorPermission } = useCurrentFileStore()
+  const { setFileTabsValue, setFileTabs } = useFileTabsStore()
 
   function resetDirectoryStoreFn () {
     rootFiles = []
     setCurrentFile(null)
     setImgFileHandles([])
+    setFileTabsValue('')
+    setFileTabs([])
   }
 
   async function selectDirectoryStoreFn() {
@@ -108,6 +114,13 @@ export async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKe
         children = await getFileList(handelEle as FileSystemDirectoryHandle, fileKey)
       }
       curObj.children = children
+      const imgListFileNode = (children as FileNode[]).filter((item) => {
+        const fileType = item.label!.split('.').pop()
+        return fileType && imgFileTypeList.includes(fileType)
+      })
+      if (imgListFileNode.length > 0) {
+        curObj.imgListFileNode = imgListFileNode
+      }
     }
 
     currentRankFiles.push(curObj)

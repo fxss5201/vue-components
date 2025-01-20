@@ -1,7 +1,7 @@
 <template>
   <div class="file-code-box" v-loading="fileLoading" v-if="codeFileTypeList.includes(fileType)">
     <el-scrollbar ref="scrollbarCodeRef">
-      <CodeCard v-model="fileReader as string" :lang="fileType" :is-editor="editorPermission" :file="props.file"></CodeCard>
+      <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
     </el-scrollbar>
   </div>
   <div class="file-md-box" v-loading="fileLoading" v-else-if="mdFileTypeList.includes(fileType)">
@@ -9,7 +9,7 @@
       <Pane size="50" min-size="20">
         <div class="full-block" style="padding-right: 12px;">
           <el-scrollbar ref="scrollbarCodeMdRef">
-            <CodeCard v-model="fileReader as string" :lang="fileType" :is-editor="editorPermission" :file="props.file"></CodeCard>
+            <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
           </el-scrollbar>
         </div>
       </Pane>
@@ -26,9 +26,9 @@
     v-else-if="officeFileTypeList.includes(fileType)"
     :fileType="fileType"
     :fileReader="fileReader as ArrayBuffer"
-    :fileReaderHeight="props.fileReaderHeight"
+    :fileReaderHeight="fileReaderHeight"
   ></OfficeFileReader>
-  <div v-else-if="imgFileTypeList.includes(fileType)" class="file-img-box" :style="{ height: `${props.fileReaderHeight}px` }">
+  <div v-else-if="imgFileTypeList.includes(fileType)" class="file-img-box" :style="{ height: `${fileReaderHeight}px` }">
     <el-image
       style="max-width: 100%"
       :src="fileReader"
@@ -43,7 +43,7 @@
       :zIndex="1000"
     />
   </div>
-  <div v-else-if="videoFileTypeList.includes(fileType)" class="file-video-box" :style="{ height: `${props.fileReaderHeight}px` }">
+  <div v-else-if="videoFileTypeList.includes(fileType)" class="file-video-box" :style="{ height: `${fileReaderHeight}px` }">
     <video
       controls
       autoplay
@@ -65,12 +65,17 @@ import { addCodeCopy } from '@/composables/addCodeCopy'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 
-const props = defineProps<{
-  file: FileSystemFileHandle
-  imgFileHandles: FileSystemFileHandle[]
-  fileReaderHeight: number
-  editorPermission: boolean
-}>()
+import { storeToRefs } from 'pinia'
+import { useCurrentFileStore } from '@/stores/fileView/currentFileStore'
+import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
+import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
+
+const { fileReaderHeight } = storeToRefs(useFileViewLayoutStore())
+const fileTabsStore = useFileTabsStore()
+const { fileTabsCurrent } = storeToRefs(fileTabsStore)
+const { updateFileTabsFileContent } = fileTabsStore
+const currentFileStore = useCurrentFileStore()
+const { editorPermission } = storeToRefs(currentFileStore)
 
 const scrollbarCodeRef = ref()
 const scrollbarCodeMdRef = ref()
@@ -83,10 +88,9 @@ const imgFileIndex = ref(0)
 const imgUrlList = ref<string[]>([])
 
 watch(
-  () => props.file,
+  () => fileTabsCurrent.value,
   async () => {
-    const file = await props.file.getFile()
-    const reader = new FileReader()
+    fileType.value = fileTabsCurrent.value!.label.split('.').pop() || ''
     nextTick(() => {
       if (scrollbarCodeRef.value) {
         scrollbarCodeRef.value.setScrollTop(0)
@@ -101,61 +105,64 @@ watch(
         scrollbarMdRef.value.setScrollLeft(0)
       }
     })
-    fileType.value = file.name.split('.').pop() || ''
     if (imgFileTypeList.includes(fileType.value)) {
-      // reader.readAsDataURL(file)
-      // reader.onload = () => {
-      //   fileReader.value = reader.result as string
-      // }
+      const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
       fileReader.value = URL.createObjectURL(file)
-      const imgUrls: string[] = []
-      for (let idx = 0; idx < props.imgFileHandles.length; idx++) {
-        const item = props.imgFileHandles[idx]
-        if (item.name === file.name) {
-          imgFileIndex.value = idx
-          imgUrls.push(fileReader.value)
-        } else {
-          const file = await item.getFile()
-          imgUrls.push(URL.createObjectURL(file))
+      if (fileTabsCurrent.value!.imgListFileNode?.length) {
+        const imgUrls: string[] = []
+        for (let idx = 0; idx < fileTabsCurrent.value!.imgListFileNode.length; idx++) {
+          const item = fileTabsCurrent.value!.imgListFileNode[idx]
+          if (item.label === fileTabsCurrent.value!.label) {
+            imgFileIndex.value = idx
+            imgUrls.push(fileReader.value)
+          } else {
+            const file = await (item.file as FileSystemFileHandle).getFile()
+            imgUrls.push(URL.createObjectURL(file))
+          }
         }
-      }
-      imgUrlList.value = imgUrls
-      return
-    } else if (mdFileTypeList.includes(fileType.value)) {
-      fileLoading.value = true
-      reader.readAsText(file)
-      reader.onload = () => {
-        fileLoading.value = false
-        fileReader.value = reader.result as string
+        imgUrlList.value =  imgUrls
+      } else {
+        imgFileIndex.value = 0
+        imgUrlList.value = []
       }
       return
-    } else if (codeFileTypeList.includes(fileType.value)) {
-      fileLoading.value = true
-      reader.readAsText(file)
-      reader.onload = () => {
-        fileLoading.value = false
-        fileReader.value = reader.result as string
+    } else if (mdFileTypeList.includes(fileType.value) || codeFileTypeList.includes(fileType.value)) {
+      if (fileTabsCurrent.value!.fileContent) {
+        fileReader.value = fileTabsCurrent.value!.fileContent
+      } else {
+        fileLoading.value = true
+        const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
+        const reader = new FileReader()
+        reader.readAsText(file)
+        reader.onload = () => {
+          fileLoading.value = false
+          fileReader.value = reader.result as string
+          updateFileTabsFileContent(fileTabsCurrent.value!.key, reader.result as string)
+        }
       }
       return
     } else if (officeFileTypeList.includes(fileType.value)) {
+      const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
+      const reader = new FileReader()
       reader.readAsArrayBuffer(file)
       reader.onload = () => {
         fileReader.value = reader.result as ArrayBuffer
       }
       return
     } else if (videoFileTypeList.includes(fileType.value)) {
+      const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
       fileReader.value = URL.createObjectURL(file)
       return
-    }
-    reader.readAsText(file)
-    reader.onload = () => {
-      console.log(reader.result) // 读取到的文件内容
     }
   },
   {
     immediate: true
   }
 )
+
+function updateModelValueFn (val: string) {
+  fileReader.value = val
+}
 
 addCodeCopy()
 </script>
