@@ -15,6 +15,20 @@
           :label="item.label"
           :name="item.key"
         >
+          <template #label>
+            <div class="tab-label-box">
+              <el-image :src="`./icons/${item.fileIcon}`" alt="file" class="file-icon">
+                <template #placeholder>
+                  <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                </template>
+                <template #error>
+                  <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                </template>
+              </el-image>
+              <div class="tab-label">{{ item.label }}</div>
+              <div v-if="item.editStatus" class="tab-edit-status"></div>
+            </div>
+          </template>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -23,12 +37,17 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
+import { getIconForFile } from 'vscode-icons-js'
+import { ElMessageBox } from 'element-plus'
+
+const defaultFileIcon = ref<string>(getIconForFile('default') as string)
 
 const fileTabsStore = useFileTabsStore()
 const { fileTabsValue, fileTabs } = storeToRefs(fileTabsStore)
-const { setFileTabsValue, removeFileTab } = fileTabsStore
+const { setFileTabsValue, removeFileTab, getFileNodeByKey, saveFileByKey, resetFileByKey } = fileTabsStore
 
 const emit = defineEmits<{
   changeFile: [key: string]
@@ -39,8 +58,30 @@ function handleTabsChangeFn(tab: string) {
   emit('changeFile', tab)
 }
 
-function handleTabsRemoveFn(tab: string) {
-  removeFileTab(tab)
+async function handleTabsRemoveFn(tab: string) {
+  const fileNode = getFileNodeByKey(tab)
+  if (fileNode!.editStatus) {
+    ElMessageBox.confirm(
+      '文件已修改，是否保存？',
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+      .then(async () => {
+        await saveFileByKey(tab)
+        removeFileTab(tab)
+      })
+      .catch(async () => {
+        await resetFileByKey(tab)
+        removeFileTab(tab)
+      })
+  } else {
+    await resetFileByKey(tab)
+    removeFileTab(tab)
+  }
 }
 </script>
 
@@ -51,9 +92,34 @@ function handleTabsRemoveFn(tab: string) {
   align-items: stretch;
   .file-tabs-box-left {
     flex: auto;
+    min-width: 0;
   }
  .file-tabs-box-right {
     flex-shrink: 0;
+  }
+}
+.tab-label-box {
+  display: flex;
+  align-items: center;
+  .file-icon {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin-right: 4px;
+  }
+  .tab-label {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+ .tab-edit-status {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    background-color: var(--el-color-primary);
+    border-radius: 50%;
+    margin-left: 4px;
   }
 }
 </style>

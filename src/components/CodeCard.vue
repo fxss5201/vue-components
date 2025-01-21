@@ -152,6 +152,10 @@ function changeTextareaWidth () {
   textareaRef.value!.style.width = Math.max(codeBodyWidth.value, codeRef.value!.offsetWidth) + 'px'
 }
 
+const emit = defineEmits<{
+  saveFile: []
+}>()
+
 async function onSaveFileFn (event: KeyboardEvent) {
   event.preventDefault()
   if (props.file) {
@@ -159,6 +163,7 @@ async function onSaveFileFn (event: KeyboardEvent) {
     await writable.write(model.value)
     await writable.close()
     ElMessage.success('保存成功')
+    emit('saveFile')
   }
 }
 

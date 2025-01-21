@@ -109,6 +109,7 @@ const fileNodeClickFn = async (data: TreeNodeData) => {
     elTreeRef.value?.setData(rootFiles)
     return
   }
+  console.log(rootFiles)
   addFileTab(data as FileNode)
   elTreeRef.value?.setCurrentKey(data.key)
 }

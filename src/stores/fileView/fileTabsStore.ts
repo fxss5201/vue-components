@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { ElMessage } from 'element-plus'
 import type { FileNode } from '@/types/fileView'
 
 export const useFileTabsStore = defineStore('fileTabsStore', () => {
@@ -73,6 +74,31 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
     })
   })
 
+  function getFileNodeByKey (key: string) {
+    return fileTabs.value.find((item) => {
+      return item.key === key
+    })
+  }
+
+  async function saveFileByKey (key: string) {
+    const fileNode = getFileNodeByKey(key)
+    const writable = await (fileNode!.file as FileSystemFileHandle).createWritable()
+    await writable.write(fileNode!.fileContent as string)
+    await writable.close()
+    ElMessage.success('保存成功')
+  }
+
+  async function resetFileByKey (key: string) {
+    const fileNode = getFileNodeByKey(key)
+    const file = await (fileNode!.file as FileSystemFileHandle).getFile()
+    const reader = new FileReader()
+    reader.readAsText(file)
+    reader.onload = () => {
+      updateFileTabsFileContent(key, reader.result as string)
+      updateFileTabsFileEditStatus(key, false)
+    }
+  }
+
   return {
     fileTabsValue,
     setFileTabsValue,
@@ -84,6 +110,9 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
     updateFileTabsFileContent,
     updateFileTabsFileEditStatus,
     updateFileTabsScroll,
-    fileTabsCurrent
+    fileTabsCurrent,
+    getFileNodeByKey,
+    saveFileByKey,
+    resetFileByKey
   }
 })

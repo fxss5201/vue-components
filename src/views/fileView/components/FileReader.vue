@@ -1,7 +1,7 @@
 <template>
   <div class="file-code-box" v-loading="fileLoading" v-if="codeFileTypeList.includes(fileType)">
     <el-scrollbar ref="scrollbarCodeRef">
-      <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
+      <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
     </el-scrollbar>
   </div>
   <div class="file-md-box" v-loading="fileLoading" v-else-if="mdFileTypeList.includes(fileType)">
@@ -9,7 +9,7 @@
       <Pane size="50" min-size="20">
         <div class="full-block" style="padding-right: 12px;">
           <el-scrollbar ref="scrollbarCodeMdRef">
-            <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
+            <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
           </el-scrollbar>
         </div>
       </Pane>
@@ -73,7 +73,7 @@ import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 const { fileReaderHeight } = storeToRefs(useFileViewLayoutStore())
 const fileTabsStore = useFileTabsStore()
 const { fileTabsCurrent } = storeToRefs(fileTabsStore)
-const { updateFileTabsFileContent } = fileTabsStore
+const { updateFileTabsFileContent, updateFileTabsFileEditStatus } = fileTabsStore
 const currentFileStore = useCurrentFileStore()
 const { editorPermission } = storeToRefs(currentFileStore)
 
@@ -162,6 +162,14 @@ watch(
 
 function updateModelValueFn (val: string) {
   fileReader.value = val
+  if (val !== fileTabsCurrent.value!.fileContent) {
+    updateFileTabsFileContent(fileTabsCurrent.value!.key, val)
+  }
+  updateFileTabsFileEditStatus(fileTabsCurrent.value!.key, true)
+}
+
+function saveFileFn () {
+  updateFileTabsFileEditStatus(fileTabsCurrent.value!.key, false)
 }
 
 addCodeCopy()
