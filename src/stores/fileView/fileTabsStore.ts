@@ -42,30 +42,18 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
   }
 
   function updateFileTabsFileContent (key: string, fileContent: string) {
-    fileTabs.value = fileTabs.value.map((item) => {
-      if (item.key === key) {
-        item.fileContent = fileContent
-      }
-      return item
-    })
+    const fileNode = getFileNodeByKey(key)
+    fileNode!.fileContent = fileContent
   }
 
   function updateFileTabsFileEditStatus (key: string, editStatus: boolean) {
-    fileTabs.value = fileTabs.value.map((item) => {
-      if (item.key === key) {
-        item.editStatus = editStatus
-      }
-      return item
-    })
+    const fileNode = getFileNodeByKey(key)
+    fileNode!.editStatus = editStatus
   }
 
   function updateFileTabsScroll (key: string, scroll: { left: number, top: number }) {
-    fileTabs.value = fileTabs.value.map((item) => {
-      if (item.key === key) {
-        item.scroll = scroll
-      }
-      return item
-    })
+    const fileNode = getFileNodeByKey(key)
+    fileNode!.scroll = scroll
   }
 
   const fileTabsCurrent = computed(() => {
@@ -75,6 +63,7 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
   })
 
   function getFileNodeByKey (key: string) {
+    console.log('fileTabs.value', fileTabs.value)
     return fileTabs.value.find((item) => {
       return item.key === key
     })
@@ -85,10 +74,11 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
     const writable = await (fileNode!.file as FileSystemFileHandle).createWritable()
     await writable.write(fileNode!.fileContent as string)
     await writable.close()
+    updateFileTabsFileEditStatus(key, false)
     ElMessage.success('保存成功')
   }
 
-  async function resetFileByKey (key: string) {
+  async function resetFileByKey (key: string, callback?: () => void) {
     const fileNode = getFileNodeByKey(key)
     const file = await (fileNode!.file as FileSystemFileHandle).getFile()
     const reader = new FileReader()
@@ -96,6 +86,7 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
     reader.onload = () => {
       updateFileTabsFileContent(key, reader.result as string)
       updateFileTabsFileEditStatus(key, false)
+      callback && callback()
     }
   }
 

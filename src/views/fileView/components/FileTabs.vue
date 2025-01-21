@@ -75,11 +75,11 @@ async function handleTabsRemoveFn(tab: string) {
         removeFileTab(tab)
       })
       .catch(async () => {
-        await resetFileByKey(tab)
-        removeFileTab(tab)
+        await resetFileByKey(tab, () => {
+          removeFileTab(tab)
+        })
       })
   } else {
-    await resetFileByKey(tab)
     removeFileTab(tab)
   }
 }
