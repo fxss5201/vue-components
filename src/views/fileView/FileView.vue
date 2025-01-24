@@ -10,7 +10,7 @@
         </Pane>
         <Pane min-size="30">
           <div class="file-view__right">
-            <FileTabs @changeFile="changeFileFn"></FileTabs>
+            <FileTabs></FileTabs>
             <FileBody></FileBody>
           </div>
         </Pane>
@@ -56,10 +56,6 @@ async function selectDirectoryFn() {
   nextTick(() => {
     fileTreeRef.value?.elTreeRef.setExpandedKeys([rootFiles[0].key])
   })
-}
-
-function changeFileFn (key: string) {
-  fileTreeRef.value?.elTreeRef.setCurrentKey(key)
 }
 </script>
 

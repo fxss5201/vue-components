@@ -48,6 +48,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SimpleSwiper: typeof import('./src/components/SimpleSwiper.vue')['default']
+    TabsScroll: typeof import('./src/components/TabsScroll.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

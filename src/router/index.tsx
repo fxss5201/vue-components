@@ -120,6 +120,14 @@ export const routes: RouteRecordRaw[] = [
       title: '代码编辑',
       iconfont: 'icon-code'
     }
+  },
+  {
+    path: '/tabsScrollView',
+    name: 'tabsScrollView',
+    component: () => import('../views/TabsScrollView.vue'),
+    meta: {
+      title: 'tabs滚动'
+    }
   }
 ]
 

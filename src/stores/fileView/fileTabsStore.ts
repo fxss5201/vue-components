@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { ElMessage } from 'element-plus'
 import type { FileNode } from '@/types/fileView'
+import { emitter } from '@/composables/mitt'
 
 export const useFileTabsStore = defineStore('fileTabsStore', () => {
   const fileTabsValue = ref('')
@@ -36,8 +37,10 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
     })
     if (fileTabs.value.length > 0) {
       setFileTabsValue(fileTabs.value[0].key!)
+      emitter.emit('updateTreeCurent', fileTabs.value[0].key!)
     } else {
       setFileTabsValue('')
+      emitter.emit('updateTreeCurent', '')
     }
   }
 
@@ -63,7 +66,6 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
   })
 
   function getFileNodeByKey (key: string) {
-    console.log('fileTabs.value', fileTabs.value)
     return fileTabs.value.find((item) => {
       return item.key === key
     })

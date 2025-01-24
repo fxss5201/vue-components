@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-icons-js'
 
 import { ArrowRight } from '@element-plus/icons-vue'
@@ -75,6 +75,8 @@ import { rootFiles, getFileList, getFileIcon } from '@/stores/fileView/fileTreeS
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 
 import { needClickLoadDirectory } from '@/config/fileConfig'
+
+import { emitter } from '@/composables/mitt'
 
 const { fileViewContentHeight } = storeToRefs(useFileViewLayoutStore())
 const { addFileTab } = useFileTabsStore()
@@ -173,6 +175,17 @@ async function fuleAddConfirmFn(ruleForm: FileAddForm) {
   currentContextmenuDirectory.value = null
   fileAddVisible.value = false
 }
+
+function updateTreeCurentFn (key: string) {
+  elTreeRef.value?.setCurrentKey(key)
+}
+
+onMounted(() => {
+  emitter.on('updateTreeCurent', updateTreeCurentFn)
+})
+onUnmounted(() => {
+  emitter.off('updateTreeCurent', updateTreeCurentFn)
+})
 </script>
 
 <style lang="scss">

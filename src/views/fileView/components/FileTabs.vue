@@ -42,6 +42,7 @@ import { storeToRefs } from 'pinia'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 import { getIconForFile } from 'vscode-icons-js'
 import { ElMessageBox } from 'element-plus'
+import { emitter } from '@/composables/mitt'
 
 const defaultFileIcon = ref<string>(getIconForFile('default') as string)
 
@@ -49,13 +50,9 @@ const fileTabsStore = useFileTabsStore()
 const { fileTabsValue, fileTabs } = storeToRefs(fileTabsStore)
 const { setFileTabsValue, removeFileTab, getFileNodeByKey, saveFileByKey, resetFileByKey } = fileTabsStore
 
-const emit = defineEmits<{
-  changeFile: [key: string]
-}>()
-
 function handleTabsChangeFn(tab: string) {
   setFileTabsValue(tab)
-  emit('changeFile', tab)
+  emitter.emit('updateTreeCurent', tab)
 }
 
 async function handleTabsRemoveFn(tab: string) {
