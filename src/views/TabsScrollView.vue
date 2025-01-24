@@ -5,6 +5,9 @@
       <el-form-item>
         <el-button @click="addFn">新增</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button @click="addAndSetFn">新增并设置为当前项</el-button>
+      </el-form-item>
       <el-form-item label="滚动速度">
         <el-input-number v-model="scrollSpeed" :min="1" :max="50" />
       </el-form-item>
@@ -76,6 +79,12 @@ function addFn () {
     key: `${curIndex}`
   })
 }
+
+function addAndSetFn () {
+  addFn()
+  tabActive.value = tabs.value[tabs.value.length - 1].key
+}
+
 function tabCloseFn (value: Tab) {
   const idx = tabs.value.findIndex((item) => item.key === value.key)
   tabs.value.splice(idx, 1)

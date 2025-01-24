@@ -1,13 +1,13 @@
 <template>
   <div class="tabs-box" ref="tabsBoxRef">
-    <el-scrollbar v-wheel="wheelHandler" ref="scrollbarRef">
+    <el-scrollbar v-wheel="wheelHandler" ref="scrollbarRef" @scroll="scrollFn">
       <div class="tabs-list">
         <div v-for="item in props.tabs" :key="item.key"
-          :class="{ 'tabs-item-active': item.key === model }"
+          :class="[`tabs-item-${item.key}` ,{ 'tabs-item-active': item.key === model }]"
           @click="tabCLickFn(item)"
           class="tabs-item">
           <div v-if="$slots.tabName" class="tabs-item-name">
-            <slot name="tabName"></slot>
+            <slot name="tabName" :data="item"></slot>
           </div>
           <div v-else class="tabs-item-name">{{ item.name }}</div>
           <div class="tabs-item-close" @click.stop="tabCloseFn(item)">
@@ -93,6 +93,32 @@ onUpdated(() => {
 })
 
 watch(
+  () => model.value,
+  () => {
+    nextTick(() => {
+      const tabsItem = tabsBoxRef.value!.querySelector(`.tabs-item-${model.value}`)
+      if (!tabsItem) {
+        return
+      }
+      const tabsFirst = tabsBoxRef.value!.querySelector(`.tabs-item-${props.tabs[0].key}`)
+      if (!tabsFirst) {
+        return
+      }
+      const tabsFirstLeft = tabsFirst!.getBoundingClientRect().left
+
+      const tabsItemLeft = tabsItem.getBoundingClientRect().left
+      const tabsItemLeftWidth = (tabsItem as HTMLElement).offsetWidth
+
+      const tabsBoxWidth = tabsBoxRef.value!.offsetWidth
+      const scrollLeftPx = tabsItemLeft - tabsFirstLeft - tabsBoxWidth + tabsItemLeftWidth
+
+      scrollbarRef.value?.setScrollLeft(scrollLeftPx)
+      scrollLeft.value = scrollLeftPx
+    })
+  }
+)
+
+watch(
   () => props.tabs,
   () => {
     getScrollLeftMax()
@@ -106,6 +132,10 @@ const tabsBoxRef = ref<HTMLDivElement>()
 useResizeObserver(tabsBoxRef, () => {
   getScrollLeftMax()
 })
+
+function scrollFn (e: { scrollLeft: number }) {
+  scrollLeft.value = e.scrollLeft
+}
 </script>
 
 <style lang="scss" scoped>

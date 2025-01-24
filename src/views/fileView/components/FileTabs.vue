@@ -1,36 +1,28 @@
 <template>
   <div class="file-tabs-box" v-if="fileTabs.length > 0">
     <div class="file-tabs-box-left">
-      <el-tabs
+      <TabsScroll
         :model-value="fileTabsValue"
-        type="border-card"
+        :tabs="fileTabs as unknown as Tab[]"
         @tab-change="handleTabsChangeFn"
-        closable
-        @tab-remove="handleTabsRemoveFn"
+        @tab-close="handleTabsRemoveFn"
         class="file-tabs"
       >
-        <el-tab-pane
-          v-for="item in fileTabs"
-          :key="item.key"
-          :label="item.label"
-          :name="item.key"
-        >
-          <template #label>
-            <div class="tab-label-box">
-              <el-image :src="`./icons/${item.fileIcon}`" alt="file" class="file-icon">
-                <template #placeholder>
-                  <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
-                </template>
-                <template #error>
-                  <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
-                </template>
-              </el-image>
-              <div class="tab-label">{{ item.label }}</div>
-              <div v-if="item.editStatus" class="tab-edit-status"></div>
-            </div>
-          </template>
-        </el-tab-pane>
-      </el-tabs>
+        <template #tabName="{ data: item }">
+          <div class="tab-label-box">
+            <el-image :src="`./icons/${item.fileIcon}`" alt="file" class="file-icon">
+              <template #placeholder>
+                <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+              </template>
+              <template #error>
+                <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+              </template>
+            </el-image>
+            <div class="tab-label" :title="item.label">{{ item.label }}</div>
+            <div v-if="item.editStatus" class="tab-edit-status"></div>
+          </div>
+        </template>
+      </TabsScroll>
     </div>
     <div class="file-tabs-box-right"></div>
   </div>
@@ -43,6 +35,8 @@ import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 import { getIconForFile } from 'vscode-icons-js'
 import { ElMessageBox } from 'element-plus'
 import { emitter } from '@/composables/mitt'
+import TabsScroll from '@/components/TabsScroll.vue'
+import type { Tab } from '@/types/TabsScrollType.ts'
 
 const defaultFileIcon = ref<string>(getIconForFile('default') as string)
 
@@ -50,13 +44,13 @@ const fileTabsStore = useFileTabsStore()
 const { fileTabsValue, fileTabs } = storeToRefs(fileTabsStore)
 const { setFileTabsValue, removeFileTab, getFileNodeByKey, saveFileByKey, resetFileByKey } = fileTabsStore
 
-function handleTabsChangeFn(tab: string) {
-  setFileTabsValue(tab)
-  emitter.emit('updateTreeCurent', tab)
+function handleTabsChangeFn(value: Tab) {
+  setFileTabsValue(value.key)
+  emitter.emit('updateTreeCurent', value.key)
 }
 
-async function handleTabsRemoveFn(tab: string) {
-  const fileNode = getFileNodeByKey(tab)
+async function handleTabsRemoveFn(value: Tab) {
+  const fileNode = getFileNodeByKey(value.key)
   if (fileNode!.editStatus) {
     ElMessageBox.confirm(
       '文件已修改，是否保存？',
@@ -68,16 +62,16 @@ async function handleTabsRemoveFn(tab: string) {
       }
     )
       .then(async () => {
-        await saveFileByKey(tab)
-        removeFileTab(tab)
+        await saveFileByKey(value.key)
+        removeFileTab(value.key)
       })
       .catch(async () => {
-        await resetFileByKey(tab, () => {
-          removeFileTab(tab)
+        await resetFileByKey(value.key, () => {
+          removeFileTab(value.key)
         })
       })
   } else {
-    removeFileTab(tab)
+    removeFileTab(value.key)
   }
 }
 </script>
