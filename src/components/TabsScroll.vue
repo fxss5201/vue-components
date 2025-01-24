@@ -2,8 +2,8 @@
   <div class="tabs-box" ref="tabsBoxRef">
     <el-scrollbar v-wheel="wheelHandler" ref="scrollbarRef" @scroll="scrollFn">
       <div class="tabs-list">
-        <div v-for="item in props.tabs" :key="item.key"
-          :class="[`tabs-item-${item.key}` ,{ 'tabs-item-active': item.key === model }]"
+        <div v-for="(item, index) in props.tabs" :key="item.key"
+          :class="[`tabs-item-${index}` ,{ 'tabs-item-active': item.key === model }]"
           @click="tabCLickFn(item)"
           class="tabs-item">
           <div v-if="$slots.tabName" class="tabs-item-name">
@@ -96,11 +96,12 @@ watch(
   () => model.value,
   () => {
     nextTick(() => {
-      const tabsItem = tabsBoxRef.value!.querySelector(`.tabs-item-${model.value}`)
+      const curIndex = props.tabs.findIndex(item => item.key === model.value)
+      const tabsItem = tabsBoxRef.value!.querySelector(`.tabs-item-${curIndex}`)
       if (!tabsItem) {
         return
       }
-      const tabsFirst = tabsBoxRef.value!.querySelector(`.tabs-item-${props.tabs[0].key}`)
+      const tabsFirst = tabsBoxRef.value!.querySelector(`.tabs-item-0`)
       if (!tabsFirst) {
         return
       }
