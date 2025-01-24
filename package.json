@@ -55,6 +55,7 @@
     "vscode-icons-js": "^11.6.1",
     "vue": "^3.4.29",
     "vue-demi": "^0.14.10",
+    "vue-json-pretty": "^2.4.0",
     "vue-router": "^4.3.3"
   },
   "devDependencies": {
