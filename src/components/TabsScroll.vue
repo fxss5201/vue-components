@@ -95,29 +95,42 @@ onUpdated(() => {
 watch(
   () => model.value,
   () => {
-    nextTick(() => {
-      const curIndex = props.tabs.findIndex(item => item.key === model.value)
-      const tabsItem = tabsBoxRef.value!.querySelector(`.tabs-item-${curIndex}`)
-      if (!tabsItem) {
-        return
-      }
-      const tabsFirst = tabsBoxRef.value!.querySelector(`.tabs-item-0`)
-      if (!tabsFirst) {
-        return
-      }
-      const tabsFirstLeft = tabsFirst!.getBoundingClientRect().left
+    currentTabScrollInToView()
+  }
+)
 
-      const tabsItemLeft = tabsItem.getBoundingClientRect().left
-      const tabsItemLeftWidth = (tabsItem as HTMLElement).offsetWidth
+function currentTabScrollInToView () {
+  nextTick(() => {
+    const curIndex = props.tabs.findIndex(item => item.key === model.value)
+    const tabsItem = tabsBoxRef.value!.querySelector(`.tabs-item-${curIndex}`)
+    if (!tabsItem) {
+      return
+    }
+    const tabsFirst = tabsBoxRef.value!.querySelector(`.tabs-item-0`)
+    if (!tabsFirst) {
+      return
+    }
+    const tabsFirstLeft = tabsFirst!.getBoundingClientRect().left
+    const tabsBoxRect = tabsBoxRef.value!.getBoundingClientRect()
+    const tabsBoxWidth = tabsBoxRect.width
 
-      const tabsBoxWidth = tabsBoxRef.value!.offsetWidth
-      const scrollLeftPx = tabsItemLeft - tabsFirstLeft - tabsBoxWidth + tabsItemLeftWidth
+    const tabsItemRect = tabsItem.getBoundingClientRect()
+
+    if (tabsItemRect.left < tabsBoxRect.left) {
+      const scrollLeftPx = tabsItemRect.left - tabsFirstLeft
 
       scrollbarRef.value?.setScrollLeft(scrollLeftPx)
       scrollLeft.value = scrollLeftPx
-    })
-  }
-)
+    } else if (tabsItemRect.left > tabsBoxRect.right) {
+      const scrollLeftPx = tabsItemRect.left - tabsFirstLeft - tabsBoxWidth + tabsItemRect.width
+
+      scrollbarRef.value?.setScrollLeft(scrollLeftPx)
+      scrollLeft.value = scrollLeftPx
+    } else {
+      return
+    }
+  })
+}
 
 watch(
   () => props.tabs,
@@ -154,7 +167,7 @@ function scrollFn (e: { scrollLeft: number }) {
     padding: 0 3px 0 12px;
     display: flex;
     align-items: center;
-    background-color: #f5f7fa;
+    background-color: #eee;
     cursor: pointer;
     &:hover {
       background-color: #fff;
@@ -184,7 +197,7 @@ function scrollFn (e: { scrollLeft: number }) {
     line-height: 1;
     border-radius: 2px;
     &:hover {
-      background-color: #f5f7fa;
+      background-color: #eee;
     }
   }
 }
