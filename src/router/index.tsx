@@ -4,7 +4,7 @@ import { House, Calendar, Coin, VideoPlay, Edit, ChatLineSquare, ScaleToOriginal
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    name: 'home',
+    name: 'HomeView',
     component: () => import('../views/HomeView.vue'),
     meta: {
       title: '首页',
@@ -13,7 +13,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/calendar',
-    name: 'calendar',
+    name: 'CalendarView',
     component: () => import('../views/CalendarView.vue'),
     meta: {
       title: '日历',
@@ -22,7 +22,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/httpCache',
-    name: 'httpCache',
+    name: 'HttpCacheView',
     component: () => import('../views/HttpCache/HttpCacheView.vue'),
     meta: {
       title: '接口缓存',
@@ -31,7 +31,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/tableRowSpan',
-    name: 'tableRowSpan',
+    name: 'TableRowSpan',
     component: () => import('../views/TableRowSpan.vue'),
     meta: {
       title: 'table 合并',
@@ -40,7 +40,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/videoView',
-    name: 'videoView',
+    name: 'VideoView',
     component: () => import('../views/VideoView.vue'),
     meta: {
       title: '视频',
@@ -49,7 +49,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/contenteditableView',
-    name: 'contenteditableView',
+    name: 'ContenteditableView',
     component: () => import('../views/ContenteditableView.vue'),
     meta: {
       title: '编辑输入框',
@@ -59,7 +59,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/resizeCardView',
-    name: 'resizeCardView',
+    name: 'ResizeCardView',
     component: () => import('../views/ResizeCardView.vue'),
     meta: {
       title: '拖拽改变大小',
@@ -68,7 +68,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/tooltip',
-    name: 'tooltip',
+    name: 'TooltipView',
     component: () => import('../views/TooltipView.vue'),
     meta: {
       title: '是否需要提示',
@@ -77,7 +77,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/simpleSwiper',
-    name: 'simpleSwiper',
+    name: 'SimpleSwiperView',
     component: () => import('../views/SimpleSwiperView.vue'),
     meta: {
       title: '简单swiper',
@@ -86,7 +86,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/echartsView',
-    name: 'echartsView',
+    name: 'EchartsView',
     component: () => import('../views/EchartsView.vue'),
     meta: {
       title: 'Echarts',
@@ -95,7 +95,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/noticeBar',
-    name: 'noticeBar',
+    name: 'NoticeBarView',
     component: () => import('../views/NoticeBarView.vue'),
     meta: {
       title: '公告栏',
@@ -104,9 +104,10 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/fileView',
-    name: 'fileView',
+    name: 'FileView',
     component: () => import('../views/fileView/FileView.vue'),
     meta: {
+      keepAlive: true,
       title: '文件预览',
       icon: <Notebook />,
       noPadding: true
@@ -114,7 +115,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/codePage',
-    name: 'codePage',
+    name: 'CodePage',
     component: () => import('../views/CodePage.vue'),
     meta: {
       title: '代码编辑',
@@ -123,7 +124,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/tabsScrollView',
-    name: 'tabsScrollView',
+    name: 'TabsScrollView',
     component: () => import('../views/TabsScrollView.vue'),
     meta: {
       title: 'tabs滚动'

@@ -1,4 +1,4 @@
-import { nextTick, onMounted, onBeforeUnmount, ref } from 'vue'
+import { nextTick, onMounted, onBeforeUnmount, ref, onUpdated } from 'vue'
 import clipboardJS, { type Event } from 'clipboard'
 import type ClipboardJS from 'clipboard'
 import { ElMessage } from 'element-plus'
@@ -28,6 +28,13 @@ export function addCodeCopy () {
   }
 
   onMounted(() => {
+    nextTick(() => {
+      initClipboard()
+    })
+  })
+
+  onUpdated(() => {
+    destroyClipboard()
     nextTick(() => {
       initClipboard()
     })

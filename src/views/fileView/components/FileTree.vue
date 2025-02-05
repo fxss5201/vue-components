@@ -71,7 +71,7 @@ import type { FileNode, FileAddForm } from '@/types/fileView'
 
 import { storeToRefs } from 'pinia'
 import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
-import { rootFiles, getFileList, getFileIcon } from '@/stores/fileView/fileTreeStore'
+import { useFileTreeStore, getFileList, getFileIcon } from '@/stores/fileView/fileTreeStore'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 
 import { needClickLoadDirectory } from '@/config/fileConfig'
@@ -95,6 +95,7 @@ const props = {
 const defaultFileIcon = ref<string>(getIconForFile('default') as string)
 const defaultFolderIcon = ref<string>(getIconForFolder('default') as string)
 const defaultOpenFolderIcon = ref<string>(getIconForOpenFolder('default') as string)
+const { rootFiles } = storeToRefs(useFileTreeStore())
 
 const fileNodeClickFn = async (data: TreeNodeData) => {
   if (!data.leaf) {
@@ -108,10 +109,10 @@ const fileNodeClickFn = async (data: TreeNodeData) => {
       data.children = await getFileList(data.file as FileSystemDirectoryHandle, data.key)
       elMessage.close()
     }
-    elTreeRef.value?.setData(rootFiles)
+    elTreeRef.value?.setData(rootFiles.value)
     return
   }
-  console.log(rootFiles)
+  console.log(rootFiles.value)
   addFileTab(data as FileNode)
   elTreeRef.value?.setCurrentKey(data.key)
 }
@@ -162,7 +163,7 @@ const addFileFn = async (ruleForm: FileAddForm) => {
     fileNode.children = []
   }
   (currentContextmenuDirectory.value as FileNode | null)?.children?.push(fileNode)
-  elTreeRef.value?.setData(rootFiles)
+  elTreeRef.value?.setData(rootFiles.value)
   elTreeRef.value?.setCurrentKey(fileNodeKey)
 }
 

@@ -1,3 +1,4 @@
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-icons-js'
 import { ElMessage } from 'element-plus'
@@ -8,14 +9,14 @@ import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 import { needClickLoadDirectory, imgFileTypeList } from '@/config/fileConfig'
 import type { FileNode } from '@/types/fileView'
 
-export let rootFiles: FileNode[] = []
-
 export const useFileTreeStore = defineStore('fileTreeStore', () => {
   const { setCurrentFile, setImgFileHandles, setEditorPermission } = useCurrentFileStore()
   const { setFileTabsValue, setFileTabs } = useFileTabsStore()
 
+  const rootFiles = ref<FileNode[]>([])
+
   function resetDirectoryStoreFn () {
-    rootFiles = []
+    rootFiles.value = []
     setCurrentFile(null)
     setImgFileHandles([])
     setFileTabsValue('')
@@ -42,7 +43,7 @@ export const useFileTreeStore = defineStore('fileTreeStore', () => {
         ElMessage.warning('当前仅有文件访问权限，如需编辑，请授予文件编辑权限')
       }
   
-      rootFiles = [
+      rootFiles.value = [
         {
           key: `/${dirHandle.name}`,
           parentKey: '',
@@ -61,6 +62,7 @@ export const useFileTreeStore = defineStore('fileTreeStore', () => {
   }
 
   return {
+    rootFiles,
     selectDirectoryStoreFn,
     resetDirectoryStoreFn
   }

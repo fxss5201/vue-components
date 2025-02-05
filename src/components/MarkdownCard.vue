@@ -5,6 +5,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import { useMarkdown } from '@/composables/useMarkdown'
+import { addCodeCopy } from '@/composables/addCodeCopy'
 
 const props = withDefaults(
   defineProps<{
@@ -27,6 +28,8 @@ watch(
     immediate: true
   }
 )
+
+addCodeCopy()
 </script>
 
 <style lang="scss">

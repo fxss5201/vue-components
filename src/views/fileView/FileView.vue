@@ -30,11 +30,14 @@ import FileBody from './components/FileBody.vue'
 import FileTree from './components/FileTree.vue'
 import FileTabs from './components/FileTabs.vue'
 
+import { storeToRefs } from 'pinia'
 import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
-import { rootFiles, useFileTreeStore } from '@/stores/fileView/fileTreeStore'
+import { useFileTreeStore } from '@/stores/fileView/fileTreeStore'
 
 const { setFileViewContentHeight } = useFileViewLayoutStore()
-const { selectDirectoryStoreFn, resetDirectoryStoreFn } = useFileTreeStore()
+const fileTreeStore = useFileTreeStore()
+const { selectDirectoryStoreFn, resetDirectoryStoreFn } = fileTreeStore
+const { rootFiles } = storeToRefs(fileTreeStore)
 
 const fileViewRef = ref<HTMLDivElement>()
 const fileViewContent = ref<HTMLDivElement | null>()
@@ -50,11 +53,11 @@ const fileTreeRef = ref<typeof FileTree>()
 
 async function selectDirectoryFn() {
   resetDirectoryStoreFn()
-  fileTreeRef.value?.elTreeRef.setData(rootFiles)
+  fileTreeRef.value?.elTreeRef.setData(rootFiles.value)
   await selectDirectoryStoreFn()
-  fileTreeRef.value?.elTreeRef.setData(rootFiles)
+  fileTreeRef.value?.elTreeRef.setData(rootFiles.value)
   nextTick(() => {
-    fileTreeRef.value?.elTreeRef.setExpandedKeys([rootFiles[0].key])
+    fileTreeRef.value?.elTreeRef.setExpandedKeys([rootFiles.value[0].key])
   })
 }
 </script>
