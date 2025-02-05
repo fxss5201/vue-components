@@ -16,9 +16,16 @@
 interface Tab {
   name: string
   key: string
+  tip?: string
   [key: string]: any
 }
 ```
+
+| 属性名 | 类型 | 说明 |
+| --- | --- | :--- |
+| name | `string` | 名称 |
+| key | `string` | 唯一标识 |
+| tip | `string` | DOM元素的 `title` |
 
 ## 事件
 

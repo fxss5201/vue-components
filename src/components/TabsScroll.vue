@@ -1,10 +1,11 @@
 <template>
   <div class="tabs-box" ref="tabsBoxRef">
-    <el-scrollbar v-wheel="wheelHandler" ref="scrollbarRef" @scroll="scrollFn">
+    <el-scrollbar v-wheel="wheelHandler" ref="scrollbarRef" @scroll="scrollFn" always>
       <div class="tabs-list">
         <div v-for="(item, index) in props.tabs" :key="item.key"
           :class="[`tabs-item-${index}` ,{ 'tabs-item-active': item.key === model }]"
           @click="tabCLickFn(item)"
+          :title="item.tip || item.name"
           class="tabs-item">
           <div v-if="$slots.tabName" class="tabs-item-name">
             <slot name="tabName" :data="item"></slot>

@@ -3,7 +3,7 @@
     <div class="file-tabs-box-left">
       <TabsScroll
         :model-value="fileTabsValue"
-        :tabs="fileTabs as unknown as Tab[]"
+        :tabs="fileTabsList as unknown as Tab[]"
         @tab-change="handleTabsChangeFn"
         @tab-close="handleTabsRemoveFn"
         class="file-tabs"
@@ -18,7 +18,7 @@
                 <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
               </template>
             </el-image>
-            <div class="tab-label" :title="item.label">{{ item.label }}</div>
+            <div class="tab-label">{{ item.label }}</div>
             <div v-if="item.editStatus" class="tab-edit-status"></div>
           </div>
         </template>
@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 import { getIconForFile } from 'vscode-icons-js'
@@ -43,6 +43,15 @@ const defaultFileIcon = ref<string>(getIconForFile('default') as string)
 const fileTabsStore = useFileTabsStore()
 const { fileTabsValue, fileTabs } = storeToRefs(fileTabsStore)
 const { setFileTabsValue, removeFileTab, getFileNodeByKey, saveFileByKey, resetFileByKey } = fileTabsStore
+
+const fileTabsList = computed(() => {
+  return fileTabs.value.map(item => {
+    return {
+      ...item,
+      tip: item.key
+    }
+  })
+})
 
 function handleTabsChangeFn(value: Tab) {
   setFileTabsValue(value.key)
