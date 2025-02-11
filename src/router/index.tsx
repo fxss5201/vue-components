@@ -27,6 +27,14 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: '年日历'
         }
+      },
+      {
+        path: '/date/monthCalendar',
+        name: 'MonthCalendar',
+        component: () => import('../views/date/MonthCalendarView.vue'),
+        meta: {
+          title: '月日历'
+        }
       }
     ]
   },
