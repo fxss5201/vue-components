@@ -12,13 +12,23 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/calendar',
-    name: 'CalendarView',
-    component: () => import('../views/CalendarView.vue'),
+    path: '/date',
+    name: 'DateView',
+    redirect: '/date/calendar',
     meta: {
       title: '日历',
       icon: <Calendar />
-    }
+    },
+    children: [
+      {
+        path: '/date/calendar',
+        name: 'CalendarView',
+        component: () => import('../views/date/CalendarView.vue'),
+        meta: {
+          title: '年日历'
+        }
+      }
+    ]
   },
   {
     path: '/httpCache',
