@@ -1,7 +1,7 @@
 <template>
   <div class="page-no-top-padding">
     <MarkdownCard :content="MonthCalendarMd" />
-    <el-form :inline="true" :model="formInline" class="demo-form-inline">
+    <el-form :inline="true" :model="formInline" style="margin-top: 20px;">
       <el-form-item label="weekStart：">
         <el-select
           v-model="formInline.weekStart"
@@ -50,24 +50,22 @@
       :need-chinese="formInline.needChinese"
       :need-holiday="formInline.needHoliday"
       @range-change="rangeChangeFn"
-      @date-item-click="dateItemClickFn"></MonthCalendar>
+      @date-item-click="dateItemClickFn">
+      <template v-slot:dateItem="{ dateItem }">
+        <div>{{ dateItem.fullDateStr }}</div>
+        <div>{{ dateItem.type }}</div>
+      </template>
+    </MonthCalendar>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import MonthCalendar from '@/components/MonthCalendar.vue'
+import type { PropsType, DateType, RangeChangeValue } from '@/components/MonthCalendar.vue'
 import MonthCalendarMd from '@/md/MonthCalendar.md?raw'
 
-interface FormInlineType {
-  weekStart: 0 | 1 | 2 | 3 | 4 | 5 | 6
-  titleFormat?: string
-  dateFormat?: string
-  needChinese?: boolean
-  needHoliday?: boolean
-}
-
-const formInline = reactive<FormInlineType>({
+const formInline = reactive<PropsType>({
   weekStart: 1,
   titleFormat: 'YYYY-MM',
   dateFormat: 'DD',
@@ -89,11 +87,11 @@ const weekNameMap = ref<WeekNameMapType>({
   6: '星期六'
 })
 
-function rangeChangeFn (value: any) {
+function rangeChangeFn (value: RangeChangeValue) {
   console.log('rangeChange', value)
 }
 
-function dateItemClickFn (value: any) {
+function dateItemClickFn (value: DateType) {
   console.log('dateItemClick', value)
 }
 </script>

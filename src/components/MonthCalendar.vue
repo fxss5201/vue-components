@@ -40,7 +40,7 @@ import dayjs from 'dayjs'
 import { Lunar, Solar, HolidayUtil } from 'lunar-typescript'
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue'
 
-interface PropsType {
+export interface PropsType {
   weekStart?: 0 | 1 | 2 | 3 | 4 | 5 | 6
   weekNames?: string[]
   titleFormat?: string
@@ -49,7 +49,7 @@ interface PropsType {
   needHoliday?: boolean
 }
 
-interface DateType {
+export interface DateType {
   date: Date
   dateStr: string
   fullDateStr: string
@@ -58,7 +58,7 @@ interface DateType {
   isWork?: boolean | undefined
 }
 
-interface RangeChangeValue {
+export interface RangeChangeValue {
   range: string[]
   rangeList: DateType[]
 }
@@ -289,14 +289,14 @@ function getHoliday (date: Date) {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          margin-left: 10px;
+          margin-left: 4px;
         }
         .work {
           flex-shrink: 0;
           font-size: 14px;
           color: #5DB034;
           line-height: 17px;
-          margin-left: 10px;
+          margin-left: 4px;
           &.text-red {
             color: #F56C6C;
           }

@@ -3,7 +3,7 @@ import clipboardJS, { type Event } from 'clipboard'
 import type ClipboardJS from 'clipboard'
 import { ElMessage } from 'element-plus'
 
-export function addCodeCopy () {
+export function useCodeCopy () {
   const clipboard = ref<ClipboardJS | null>(null)
   const clipboardTime = ref<number | null>(null)
 

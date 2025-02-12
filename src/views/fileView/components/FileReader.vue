@@ -61,7 +61,6 @@ import MarkdownCard from '@/components/MarkdownCard.vue'
 import OfficeFileReader from '@/components/OfficeFileReader.vue'
 import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList } from '@/config/fileConfig'
 import CodeCard from '@/components/CodeCard.vue'
-import { addCodeCopy } from '@/composables/addCodeCopy'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 
@@ -171,8 +170,6 @@ function updateModelValueFn (val: string) {
 function saveFileFn () {
   updateFileTabsFileEditStatus(fileTabsCurrent.value!.key, false)
 }
-
-addCodeCopy()
 </script>
 
 <style lang="scss" scoped>

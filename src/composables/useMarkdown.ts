@@ -27,7 +27,7 @@ import githubDark from '@shikijs/themes/github-dark'
 import { createHighlighterCoreSync, type HighlighterCore } from 'shiki/core'
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript'
 import type MarkdownIt from 'markdown-it/index.js'
-import addCodeCard from './addCodeCard'
+import useCodeCard from './useCodeCard'
 
 const md: MarkdownIt = new markdownIt({
   html: true,
@@ -101,7 +101,7 @@ function codeStylePlugin () {
     } else {
       highlighted = md.utils.escapeHtml(token.content)
     }
-    return addCodeCard(highlighted, token.content, langName, true)
+    return useCodeCard(highlighted, token.content, langName, true)
   }
 }
 
