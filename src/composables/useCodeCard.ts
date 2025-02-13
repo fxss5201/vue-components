@@ -6,7 +6,12 @@ const bgColorStyle = '#24292e'
 
 function lineNumbersCode(preCode: string) {
   const lines = preCode.split('\n')
-  const lineNumbers = lines.map((_, i) => i + 1)
+  const lineNumbers = lines.filter((x, i) => {
+    if (i === lines.length - 1 && x === '') {
+      return false
+    }
+    return true
+  }).map((_, i) => i + 1)
   let html = `<div class="code-line-box" style="color: ${colorStyle};border-right-color: ${borderColorStyle}">`
   lineNumbers.forEach(item => {
     html += `<div class="code-line">${item}</div>`

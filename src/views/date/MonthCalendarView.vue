@@ -63,6 +63,7 @@
 import { reactive, ref } from 'vue'
 import MonthCalendar from '@/components/MonthCalendar.vue'
 import type { PropsType, DateType, RangeChangeValue } from '@/components/MonthCalendar.vue'
+import MarkdownCard from '@/components/MarkdownCard.vue'
 import MonthCalendarMd from '@/md/MonthCalendar.md?raw'
 
 const formInline = reactive<PropsType>({

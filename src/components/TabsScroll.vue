@@ -151,6 +151,10 @@ useResizeObserver(tabsBoxRef, () => {
 function scrollFn (e: { scrollLeft: number }) {
   scrollLeft.value = e.scrollLeft
 }
+
+defineExpose({
+  currentTabScrollInToView
+})
 </script>
 
 <style lang="scss" scoped>

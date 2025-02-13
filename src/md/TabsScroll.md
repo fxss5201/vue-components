@@ -41,4 +41,10 @@ interface Tab {
 | --- | --- |
 | tabName | 自定义标题 |
 
+## Exposes
+
+| 方法名 | 说明 |
+| --- | :--- |
+| currentTabScrollInToView | 当前选中的 tab 滚动到可视区域 |
+
 ## 例子

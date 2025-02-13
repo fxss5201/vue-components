@@ -11,9 +11,16 @@
       <el-form-item label="滚动速度">
         <el-input-number v-model="scrollSpeed" :min="1" :max="50" />
       </el-form-item>
+      <el-form-item label="当前选中项">
+        <el-input-number v-model="current" :min="1" :max="tabs.length" />
+        <el-button @click="setFn">设置</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="scrollFn">当前项移动到可视区域内</el-button>
+      </el-form-item>
     </el-form>
     <ResizeCard :defaultHeight="100" :minHeight="80" :maxHeight="120">
-      <TabsScroll v-model="tabActive" :tabs="tabs" :scrollSpeed="scrollSpeed" @tab-close="tabCloseFn"></TabsScroll>
+      <TabsScroll ref="tabsScrollRef" v-model="tabActive" :tabs="tabs" :scrollSpeed="scrollSpeed" @tab-close="tabCloseFn"></TabsScroll>
     </ResizeCard>
   </div>
 </template>
@@ -70,7 +77,8 @@ const tabs = ref<Tab[]>([
     key: '10'
   }
 ])
-const tabActive = ref(tabs.value[0].key)
+const tabActive = ref<string>(tabs.value[0].key)
+const current = ref<number>(Number(tabActive.value))
 function addFn () {
   const lastTab = tabs.value[tabs.value.length - 1]
   const curIndex = Number(lastTab.key) + 1
@@ -83,6 +91,16 @@ function addFn () {
 function addAndSetFn () {
   addFn()
   tabActive.value = tabs.value[tabs.value.length - 1].key
+  current.value = Number(tabActive.value)
+}
+
+function setFn () {
+  tabActive.value = current.value.toString()
+}
+
+const tabsScrollRef = ref<typeof TabsScroll>()
+function scrollFn () {
+  tabsScrollRef.value?.currentTabScrollInToView()
 }
 
 function tabCloseFn (value: Tab) {

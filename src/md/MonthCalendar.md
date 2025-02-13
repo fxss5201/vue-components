@@ -10,7 +10,7 @@
 | weekNames | `string[]` | ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'] | 周的中文名称 |
 | titleFormat | `string` | YYYY-MM | 标题的格式，以 [dayjs](https://day.js.org/docs/en/parse/string-format#list-of-all-available-parsing-tokens) 格式 |
 | dateFormat | `string` | DD | 月天格式，以 [dayjs](https://day.js.org/docs/en/parse/string-format#list-of-all-available-parsing-tokens) 格式 |
-| needChinese | `boolean` | true | 是否展示阴历日期 |
+| needChinese | `boolean` | true | 是否展示农历日期 |
 | needHoliday | `boolean` | true | 是否展示根据国家法定节假日 休/班 |
 
 ## 事件

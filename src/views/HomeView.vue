@@ -1,5 +1,10 @@
-<script setup lang="ts"></script>
-
 <template>
-  <main>首页</main>
+  <div class="page-no-top-padding">
+    <MarkdownCard :content="HomeMd" />
+  </div>
 </template>
+
+<script setup lang="ts">
+import MarkdownCard from '@/components/MarkdownCard.vue'
+import HomeMd from '@/md/Home.md?raw'
+</script>
