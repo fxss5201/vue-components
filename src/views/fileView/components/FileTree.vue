@@ -197,7 +197,17 @@ const filterMethod = (query: string, node: TreeNodeData) => node.label!.toLowerC
 
 function updateTreeCurentFn (key: string) {
   elTreeRef.value?.setCurrentKey(key)
+  elTreeRef.value?.setExpandedKeys(getExpandedKeys(key))
   elTreeRef.value?.scrollToNode(key)
+}
+
+function getExpandedKeys (key: string) {
+  const keys = key.split('/').filter(x => x).slice(0, -1)
+  const result = []
+  for (let i = 0; i < keys.length; i++) {
+    result.push(`/${keys.slice(0, i + 1).join('/')}`)
+  }
+  return result
 }
 
 onMounted(() => {
