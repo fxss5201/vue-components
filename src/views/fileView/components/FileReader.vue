@@ -1,10 +1,5 @@
 <template>
-  <div class="file-code-box" v-loading="fileLoading" v-if="codeFileTypeList.includes(fileType)">
-    <el-scrollbar ref="scrollbarCodeRef">
-      <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
-    </el-scrollbar>
-  </div>
-  <div class="file-md-box" v-loading="fileLoading" v-else-if="mdFileTypeList.includes(fileType)">
+  <div class="file-md-box" v-loading="fileLoading" v-if="havePreviewFileTypeList.includes(fileType)">
     <Splitpanes :dbl-click-splitter="false" :push-other-panes="false">
       <Pane size="50" min-size="20">
         <div class="full-block">
@@ -16,11 +11,17 @@
       <Pane size="50" min-size="20">
         <div class="full-block">
           <el-scrollbar ref="scrollbarMdRef">
-            <MarkdownCard :content="fileReader as string"></MarkdownCard>
+            <MarkdownCard v-if="fileType === 'md'" :content="(fileReader as string)"></MarkdownCard>
+            <JsonView v-else-if="fileType === 'json'" :json="getFileReaderJson(fileReader as string)"></JsonView>
           </el-scrollbar>
         </div>
       </Pane>
     </Splitpanes>
+  </div>
+  <div class="file-code-box" v-loading="fileLoading" v-else-if="codeFileTypeList.includes(fileType)">
+    <el-scrollbar ref="scrollbarCodeRef">
+      <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
+    </el-scrollbar>
   </div>
   <OfficeFileReader
     v-else-if="officeFileTypeList.includes(fileType)"
@@ -59,8 +60,9 @@
 import { nextTick, ref, watch } from 'vue'
 import MarkdownCard from '@/components/MarkdownCard.vue'
 import OfficeFileReader from '@/components/OfficeFileReader.vue'
-import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList } from '@/config/fileConfig'
+import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList, havePreviewFileTypeList } from '@/config/fileConfig'
 import CodeCard from '@/components/CodeCard.vue'
+import JsonView from '@/components/JsonView.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { readFileAsText, readFileAsArrayBuffer, readFileAsDataURL } from '@/utils/fileReader'
@@ -185,6 +187,14 @@ function updateModelValueFn (val: string) {
 
 function saveFileFn () {
   updateFileTabsFileEditStatus(fileTabsCurrent.value!.key, false)
+}
+
+function getFileReaderJson (val: string) {
+  try {
+    return JSON.parse(val)
+  } catch (error) {
+    return {}
+  } 
 }
 </script>
 

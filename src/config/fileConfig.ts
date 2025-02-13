@@ -6,4 +6,6 @@ export const codeFileTypeList = ['js', 'cjs', 'mjs', 'ts', 'css', 'scss', 'less'
 export const officeFileTypeList = ['docx', 'xlsx', 'pdf', 'pptx', 'xls']
 export const videoFileTypeList = ['mp4', 'webm', 'ogg', 'flv', 'mp3']
 
+export const havePreviewFileTypeList = ['md', 'json']
+
 export const needClickLoadDirectory = ['node_modules', '.git', '.github', '.vscode']

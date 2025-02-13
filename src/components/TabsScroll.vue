@@ -160,6 +160,7 @@ defineExpose({
 <style lang="scss" scoped>
 .tabs-box {
   height: 40px;
+  background-color: #eee;
 }
 
 .tabs-list {
