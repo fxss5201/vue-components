@@ -11,7 +11,9 @@
         <Pane min-size="30">
           <div class="file-view__right">
             <FileTabs></FileTabs>
-            <FileBody></FileBody>
+            <div style="width: 100%;height: calc(100% - 40px);">
+              <FileBody></FileBody>
+            </div>
           </div>
         </Pane>
       </Splitpanes>

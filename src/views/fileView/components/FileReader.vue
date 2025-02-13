@@ -7,14 +7,14 @@
   <div class="file-md-box" v-loading="fileLoading" v-else-if="mdFileTypeList.includes(fileType)">
     <Splitpanes :dbl-click-splitter="false" :push-other-panes="false">
       <Pane size="50" min-size="20">
-        <div class="full-block" style="padding-right: 12px;">
+        <div class="full-block">
           <el-scrollbar ref="scrollbarCodeMdRef">
             <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
           </el-scrollbar>
         </div>
       </Pane>
       <Pane size="50" min-size="20">
-        <div class="full-block" style="padding-left: 12px;">
+        <div class="full-block">
           <el-scrollbar ref="scrollbarMdRef">
             <MarkdownCard :content="fileReader as string"></MarkdownCard>
           </el-scrollbar>
@@ -63,11 +63,13 @@ import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, 
 import CodeCard from '@/components/CodeCard.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
+import { readFileAsText, readFileAsArrayBuffer, readFileAsDataURL } from '@/utils/fileReader'
 
 import { storeToRefs } from 'pinia'
 import { useCurrentFileStore } from '@/stores/fileView/currentFileStore'
 import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
+import { getParentFileDataByKey } from '@/stores/fileView/fileTreeStore'
 
 const { fileReaderHeight } = storeToRefs(useFileViewLayoutStore())
 const fileTabsStore = useFileTabsStore()
@@ -106,17 +108,27 @@ watch(
     })
     if (imgFileTypeList.includes(fileType.value)) {
       const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
-      fileReader.value = URL.createObjectURL(file)
-      if (fileTabsCurrent.value!.imgListFileNode?.length) {
+      try {
+        fileReader.value = await readFileAsDataURL(file)
+      } catch (error) {
+        console.log(error)
+      }
+      const curFileParentData = getParentFileDataByKey(fileTabsCurrent.value!.key)
+      if (curFileParentData.imgListFileNode?.length) {
         const imgUrls: string[] = []
-        for (let idx = 0; idx < fileTabsCurrent.value!.imgListFileNode.length; idx++) {
-          const item = fileTabsCurrent.value!.imgListFileNode[idx]
-          if (item.label === fileTabsCurrent.value!.label) {
+        for (let idx = 0; idx < curFileParentData.imgListFileNode.length; idx++) {
+          const item = curFileParentData.imgListFileNode[idx]
+          if (item.key === fileTabsCurrent.value!.key) {
             imgFileIndex.value = idx
-            imgUrls.push(fileReader.value)
+            imgUrls.push(fileReader.value as string)
           } else {
             const file = await (item.file as FileSystemFileHandle).getFile()
-            imgUrls.push(URL.createObjectURL(file))
+            try {
+              const fileUrl = await readFileAsDataURL(file)
+              imgUrls.push(fileUrl)
+            } catch (error) {
+              console.log(error)
+            }
           }
         }
         imgUrlList.value =  imgUrls
@@ -131,26 +143,30 @@ watch(
       } else {
         fileLoading.value = true
         const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
-        const reader = new FileReader()
-        reader.readAsText(file)
-        reader.onload = () => {
+        try {
+          fileReader.value = await readFileAsText(file)
           fileLoading.value = false
-          fileReader.value = reader.result as string
-          updateFileTabsFileContent(fileTabsCurrent.value!.key, reader.result as string)
+          updateFileTabsFileContent(fileTabsCurrent.value!.key, fileReader.value)
+        } catch (error) {
+          console.log(error)
         }
       }
       return
     } else if (officeFileTypeList.includes(fileType.value)) {
       const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
-      const reader = new FileReader()
-      reader.readAsArrayBuffer(file)
-      reader.onload = () => {
-        fileReader.value = reader.result as ArrayBuffer
+      try {
+        fileReader.value = await readFileAsArrayBuffer(file)
+      } catch (error) {
+        console.log(error)
       }
       return
     } else if (videoFileTypeList.includes(fileType.value)) {
       const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
-      fileReader.value = URL.createObjectURL(file)
+      try {
+        fileReader.value = await readFileAsDataURL(file)
+      } catch (error) {
+        console.log(error)
+      }
       return
     }
   },

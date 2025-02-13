@@ -139,3 +139,25 @@ export async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKe
   })
   return currentRankFiles
 }
+
+export function getFileDataByKey (key: string): FileNode {
+  const keyArr = key.split('/').filter(x => x)
+  let curObj = {} as unknown as FileNode
+  for (let i = 0; i < keyArr.length; i++) {
+    if (i === 0) {
+      curObj = useFileTreeStore().rootFiles.find((item) => {
+        return item.key === `/${keyArr.slice(0, i + 1).join('/')}`
+      }) as FileNode
+    } else {
+      curObj = curObj.children?.find((item) => {
+        return item.key === `/${keyArr.slice(0, i + 1).join('/')}`
+      }) as FileNode
+    }
+  }
+  return curObj
+}
+
+export function getParentFileDataByKey (key: string): FileNode {
+  const keyArr = key.split('/')
+  return getFileDataByKey(keyArr.slice(0, -1).join('/'))
+}
