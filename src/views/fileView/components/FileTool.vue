@@ -98,6 +98,8 @@ function getScrollLeftMax () {
   nextTick(() => {
     const scrollbarWrap = scrollbarRef.value!.$el.querySelector('.el-scrollbar__wrap')
     scrollLeftMax.value = scrollbarWrap.scrollWidth - scrollbarWrap.offsetWidth
+    scrollLeft.value = scrollLeftMax.value
+    scrollbarRef.value?.setScrollLeft(scrollLeft.value)
   })
 }
 
