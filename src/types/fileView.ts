@@ -15,6 +15,7 @@ export interface FileNode {
   imgListFileNode?: FileNode[]
   editStatus?: boolean
   children?: FileNode[]
+  closePreview?: boolean
 }
 
 export interface FileAddForm {

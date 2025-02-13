@@ -11,7 +11,8 @@
         <Pane min-size="30">
           <div class="file-view__right">
             <FileTabs></FileTabs>
-            <div style="width: 100%;height: calc(100% - 40px);">
+            <FileTool></FileTool>
+            <div style="width: 100%;height: calc(100% - 76px);">
               <FileBody></FileBody>
             </div>
           </div>
@@ -31,6 +32,7 @@ import FileMenu from './components/FileMenu.vue'
 import FileBody from './components/FileBody.vue'
 import FileTree from './components/FileTree.vue'
 import FileTabs from './components/FileTabs.vue'
+import FileTool from './components/FileTool.vue'
 
 import { storeToRefs } from 'pinia'
 import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'

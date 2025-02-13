@@ -1,6 +1,6 @@
 <template>
   <div class="file-md-box" v-loading="fileLoading" v-if="havePreviewFileTypeList.includes(fileType)">
-    <Splitpanes :dbl-click-splitter="false" :push-other-panes="false">
+    <Splitpanes v-if="!fileClosePreview" :dbl-click-splitter="false" :push-other-panes="false">
       <Pane size="50" min-size="20">
         <div class="full-block">
           <el-scrollbar ref="scrollbarCodeMdRef">
@@ -17,6 +17,9 @@
         </div>
       </Pane>
     </Splitpanes>
+    <el-scrollbar v-else ref="scrollbarCodeMdRef">
+      <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
+    </el-scrollbar>
   </div>
   <div class="file-code-box" v-loading="fileLoading" v-else-if="codeFileTypeList.includes(fileType)">
     <el-scrollbar ref="scrollbarCodeRef">
@@ -57,7 +60,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, ref, watch, computed } from 'vue'
 import MarkdownCard from '@/components/MarkdownCard.vue'
 import OfficeFileReader from '@/components/OfficeFileReader.vue'
 import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList, havePreviewFileTypeList } from '@/config/fileConfig'
@@ -176,6 +179,9 @@ watch(
     immediate: true
   }
 )
+const fileClosePreview = computed(() => {
+  return fileTabsCurrent.value?.closePreview
+})
 
 function updateModelValueFn (val: string) {
   fileReader.value = val
@@ -189,11 +195,15 @@ function saveFileFn () {
   updateFileTabsFileEditStatus(fileTabsCurrent.value!.key, false)
 }
 
+const jsonOld = ref()
 function getFileReaderJson (val: string) {
   try {
-    return JSON.parse(val)
+    const json = JSON.parse(val)
+    jsonOld.value = json
+    return json
   } catch (error) {
-    return {}
+    console.log(error)
+    return jsonOld.value
   } 
 }
 </script>
@@ -204,6 +214,9 @@ function getFileReaderJson (val: string) {
 .full-block {
   width: 100%;
   height: 100%;
+  :deep(.code-card) {
+    border-radius: 0;
+  }
 }
 .file-img-box,
 .file-video-box {

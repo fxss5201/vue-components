@@ -54,6 +54,11 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
     fileNode!.editStatus = editStatus
   }
 
+  function updateFileTabsFileClosePreview (key: string, closePreview: boolean) {
+    const fileNode = getFileNodeByKey(key)
+    fileNode!.closePreview = closePreview
+  }
+
   function updateFileTabsScroll (key: string, scroll: { left: number, top: number }) {
     const fileNode = getFileNodeByKey(key)
     fileNode!.scroll = scroll
@@ -102,6 +107,7 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
     removeFileTab,
     updateFileTabsFileContent,
     updateFileTabsFileEditStatus,
+    updateFileTabsFileClosePreview,
     updateFileTabsScroll,
     fileTabsCurrent,
     getFileNodeByKey,
