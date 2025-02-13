@@ -3,20 +3,24 @@
     v-if="fileTabsCurrent"
     class="file-tool">
     <div class="file-tool-left">
-      <div class="file-tool-left-item" v-for="(item, index) in keysArr" :key="index">
-        <el-icon v-if="index > 0" class="file-key-icon"><ArrowRight /></el-icon>
-        <div class="file-key">
-          <el-image v-if="index === keysArr.length - 1" :src="`./icons/${fileIcon}`" alt="file" class="file-icon">
-            <template #placeholder>
-              <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
-            </template>
-            <template #error>
-              <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
-            </template>
-          </el-image>
-          <div>{{ item }}</div>
+      <el-scrollbar style="width: 100%;" v-wheel="wheelHandler" ref="scrollbarRef" @scroll="scrollFn" always>
+        <div class="file-tool-left-wrap">
+          <div class="file-tool-left-item" v-for="(item, index) in keysArr" :key="index">
+            <el-icon v-if="index > 0" class="file-key-icon"><ArrowRight /></el-icon>
+            <div class="file-key">
+              <el-image v-if="index === keysArr.length - 1" :src="`./icons/${fileIcon}`" alt="file" class="file-icon">
+                <template #placeholder>
+                  <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                </template>
+                <template #error>
+                  <img :src="`./icons/${defaultFileIcon}`" alt="file" class="file-icon" />
+                </template>
+              </el-image>
+              <div>{{ item }}</div>
+            </div>
+          </div>
         </div>
-      </div>
+      </el-scrollbar>
     </div>
     <div class="file-tool-right">
       <template v-if="havePreviewFileTypeList.includes(fileType)">
@@ -28,12 +32,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick, onMounted, onUpdated } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 import { ArrowRight } from '@element-plus/icons-vue'
 import { getIconForFile } from 'vscode-icons-js'
 import { havePreviewFileTypeList } from '@/config/fileConfig'
+import { vWheel } from '@/directive/vWheel'
+import { ElScrollbar } from 'element-plus'
 
 const fileTabsStore = useFileTabsStore()
 const { updateFileTabsFileClosePreview } = fileTabsStore
@@ -65,6 +71,43 @@ const defaultFileIcon = ref<string>(getIconForFile('default') as string)
 function changeFileClosePreview (status: boolean) {
   updateFileTabsFileClosePreview(fileTabsCurrent.value!.key, status)
 }
+
+const scrollbarRef = ref<typeof ElScrollbar>()
+const scrollLeft = ref(0)
+const scrollLeftMax = ref(0)
+function wheelHandler (e: WheelEvent) {
+  e.preventDefault()
+  if (e.deltaY > 0) {
+    scrollLeft.value += 18
+  } else {
+    scrollLeft.value -= 18
+  }
+  if (scrollLeft.value < 0) {
+    scrollLeft.value = 0
+  } else if (scrollLeft.value > scrollLeftMax.value) {
+    scrollLeft.value = scrollLeftMax.value
+  }
+  scrollbarRef.value?.setScrollLeft(scrollLeft.value)
+}
+
+function scrollFn (e: { scrollLeft: number }) {
+  scrollLeft.value = e.scrollLeft
+}
+
+function getScrollLeftMax () {
+  nextTick(() => {
+    const scrollbarWrap = scrollbarRef.value!.$el.querySelector('.el-scrollbar__wrap')
+    scrollLeftMax.value = scrollbarWrap.scrollWidth - scrollbarWrap.offsetWidth
+  })
+}
+
+onMounted(() => {
+  getScrollLeftMax()
+})
+
+onUpdated(() => {
+  getScrollLeftMax()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -77,13 +120,28 @@ function changeFileClosePreview (status: boolean) {
   padding: 0 10px;
   background-color: #24292e;
   border-bottom: 1px dashed #555;
+  overflow: hidden;
 
   .file-tool-left,
   .file-tool-left-item,
   .file-key,
-  .file-tool-right {
+  .file-tool-right,
+  .file-tool-left-wrap {
     display: flex;
     align-items: center;
+  }
+
+  .file-tool-left-wrap {
+    height: 36px;
+  }
+
+  .file-tool-left {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .file-tool-right {
+    flex-shrink: 0;
+    margin-left: 10px;
   }
 
   .file-key-icon {
