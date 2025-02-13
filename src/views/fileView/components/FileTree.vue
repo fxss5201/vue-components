@@ -1,4 +1,11 @@
 <template>
+  <div v-if="rootFiles.length" class="inpit-box">
+    <el-input
+      v-model="queryWord"
+      placeholder="搜索文件"
+      @input="onQueryChanged"
+    />
+  </div>
   <el-tree-v2
     ref="elTreeRef"
     class="file-tree"
@@ -6,9 +13,10 @@
     :icon="ArrowRight"
     highlight-current
     node-key="key"
+    :filter-method="filterMethod"
     @node-click="fileNodeClickFn"
     @node-contextmenu="fileNodeContextmenuFn"
-    :height="fileViewContentHeight"
+    :height="fileViewContentHeight - 52"
     empty-text="请选择文件夹"
   >
     <template #default="{ node, data }">
@@ -114,6 +122,11 @@ const fileNodeClickFn = async (data: TreeNodeData) => {
   }
   addFileTab(data as FileNode)
   elTreeRef.value?.setCurrentKey(data.key)
+  if (queryWord.value) {
+    queryWord.value = ''
+    onQueryChanged(queryWord.value)
+    elTreeRef.value?.scrollToNode(data.key)
+  }
 }
 
 let currentContextmenuDirectory = ref<FileNode | null>(null)
@@ -176,8 +189,15 @@ async function fuleAddConfirmFn(ruleForm: FileAddForm) {
   fileAddVisible.value = false
 }
 
+const queryWord = ref('')
+const onQueryChanged = (query: string) => {
+  elTreeRef.value!.filter(query)
+}
+const filterMethod = (query: string, node: TreeNodeData) => node.label!.toLowerCase().includes(query.toLowerCase())
+
 function updateTreeCurentFn (key: string) {
   elTreeRef.value?.setCurrentKey(key)
+  elTreeRef.value?.scrollToNode(key)
 }
 
 onMounted(() => {
@@ -189,6 +209,13 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss">
+.inpit-box {
+  padding: 10px;
+  width: 100%;
+  .el-input {
+    width: 100%;
+  }
+}
 .file-tree {
   width: 100%;
   overflow: hidden;

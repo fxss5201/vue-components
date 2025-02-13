@@ -141,7 +141,6 @@ watch(
         imgFileIndex.value = 0
         imgUrlList.value = []
       }
-      return
     } else if (mdFileTypeList.includes(fileType.value) || codeFileTypeList.includes(fileType.value)) {
       if (fileTabsCurrent.value!.fileContent) {
         fileReader.value = fileTabsCurrent.value!.fileContent
@@ -156,7 +155,6 @@ watch(
           console.log(error)
         }
       }
-      return
     } else if (officeFileTypeList.includes(fileType.value)) {
       const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
       try {
@@ -164,7 +162,6 @@ watch(
       } catch (error) {
         console.log(error)
       }
-      return
     } else if (videoFileTypeList.includes(fileType.value)) {
       const file = await (fileTabsCurrent.value?.file as FileSystemFileHandle).getFile()
       try {
@@ -172,7 +169,6 @@ watch(
       } catch (error) {
         console.log(error)
       }
-      return
     }
   },
   {
