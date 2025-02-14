@@ -9,46 +9,33 @@
 - 个人博客：<https://blog.fxss.work/>
 - web库：<https://www.fxss.work/webLibraries/>
 
-This template should help get you started developing with Vue 3 in Vite.
+## 项目介绍
 
-## Recommended IDE Setup
+本项目主要用于实现一些业务组件或者对一些功能的测试实践，方便以后的使用。
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- 使用技术栈：Vue3 + TypeScript + Vite + Element Plus
 
-## Type Support for `.vue` Imports in TS
+## 项目启动
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-pnpm install
+```bash
+npm install
+npm run dev
 ```
 
-### Compile and Hot-Reload for Development
+## 功能介绍
 
-```sh
-pnpm dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-pnpm build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-pnpm test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-pnpm lint
-```
+- 日历
+  - 年日历：可配置农历、假期的全年日历
+  - 月日历：可配置农历、假期的当月日历
+- 接口缓存：自行实现的接口缓存功能，并使用 本地mock 服务器功能
+- table合并：表格某个列中相同的内容合并
+- 视频
+- 编辑输入框
+- 拖拽改变大小
+- 是否需要提示
+- 简单swiper
+- Echarts
+- 公告栏
+- 类vscode实现：浏览器中的代码编辑器，支持新增文件及文件夹
+- 代码编辑：代码编辑功能
+- tabs滚动
