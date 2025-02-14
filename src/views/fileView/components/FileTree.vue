@@ -101,7 +101,7 @@ import type { ButtonItemProps } from '@/types/ButtonItemProps.ts'
 
 import { storeToRefs } from 'pinia'
 import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
-import { useFileTreeStore, getFileList, getFileIcon, getParentFileDataByKey } from '@/stores/fileView/fileTreeStore'
+import { useFileTreeStore, getFileList, getFileIcon, getParentFileDataByKey, getFileDataByKey } from '@/stores/fileView/fileTreeStore'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 
 import { needClickLoadDirectory } from '@/config/fileConfig'
@@ -109,7 +109,7 @@ import { needClickLoadDirectory } from '@/config/fileConfig'
 import { emitter } from '@/composables/mitt'
 
 const { fileViewContentHeight } = storeToRefs(useFileViewLayoutStore())
-const { addFileTab, removeFileTab } = useFileTabsStore()
+const { addFileTab, removeFileTab, updateFileKeyAndLabel, updateFileKey } = useFileTabsStore()
 
 const elTreeRef = ref<typeof ElTreeV2>()
 defineExpose({
@@ -169,6 +169,10 @@ const fileButtonList = ref<ButtonItemProps[]>([
     name: '在同级新增文件夹'
   },
   {
+    key: 'renameFile',
+    name: '重命名'
+  },
+  {
     key: 'deleteFile',
     name: '删除文件'
   }
@@ -183,17 +187,25 @@ const directoryButtonList = ref<ButtonItemProps[]>([
     name: '新增文件夹'
   },
   {
+    key: 'renameDirectory',
+    name: '重命名'
+  },
+  {
     key: 'deleteDirectory',
     name: '删除文件夹'
   }
 ])
 const fileNodeContextmenuFn = (e: Event, data: TreeNodeData) => {
-  console.log(data)
+  // console.log(data)
   if (data.leaf) {
     buttonList.value = fileButtonList.value
     currentContextmenu.value = getParentFileDataByKey(data.key) as FileNode
   } else {
-    buttonList.value = directoryButtonList.value
+    if (!data.parentKey) {
+      buttonList.value = directoryButtonList.value.filter(x => x.key !== 'renameDirectory')
+    } else {
+      buttonList.value = directoryButtonList.value
+    }
     currentContextmenu.value = data as FileNode
   }
   currentContextmenuCopy.value = data as FileNode
@@ -218,11 +230,79 @@ function buttonListClickFn (item: ButtonItemProps) {
       currentContextmenuType.value = 'directory'
       fileAddVisible.value = true
       break
+    case 'renameFile':
+    case 'renameDirectory':
+      renameFileBeforeFn()
+      break
     case 'deleteFile':
     case 'deleteDirectory':
       deleteFileBeforeFn()
       break
   }
+}
+
+function renameFileBeforeFn () {
+  const fileName = currentContextmenuCopy.value!.label
+  ElMessageBox.prompt(`原名称：${fileName}，请输入新名称`, '重命名', {
+    inputPattern: /^[a-zA-Z_\u4e00-\u9fa5.-][a-zA-Z0-9_\u4e00-\u9fa5.-]*(?=\.[^.]+$|$)/,
+    inputErrorMessage: '名称必填，只能包含数字、字母、下划线、中文、点和减号，且不能以数字或点开头或结尾，不需要包含类型后缀',
+  })
+    .then(({ value }) => {
+      renameFileFn(value)
+    })
+    .catch(() => {})
+}
+
+async function renameFileFn (newName: string) {
+  if (!currentContextmenuCopy.value) return
+  const fileHandle = currentContextmenuCopy.value.file
+  if (!fileHandle) return
+  try {
+    if (currentContextmenuCopy.value.leaf) {
+      const fileType = currentContextmenuCopy.value!.label.split('.').pop()
+      const oldKey = currentContextmenuCopy.value.key
+      const newFileName = `${newName}.${fileType}`
+      // @ts-ignore
+      await fileHandle.move(newFileName)
+      currentContextmenuCopy.value!.label = newFileName
+      const fileNode = getFileDataByKey(oldKey) as FileNode
+      fileNode.key = fileNode.key!.replace(fileNode.label, newFileName)
+      fileNode.label = newFileName
+      updateFileKeyAndLabel(oldKey, newFileName)
+    } else {
+      const oldKey = currentContextmenuCopy.value.key
+      const parentFileNode = getParentFileDataByKey(oldKey) as FileNode
+      if (!parentFileNode) return
+      if (!parentFileNode.file) return
+      // @ts-ignore
+      if (!parentFileNode.file.move) {
+        ElMessage.error('该文件系统不支持文件夹重命名')
+        return
+      }
+      // @ts-ignore
+      await parentFileNode.file.move(currentContextmenuCopy.value.file, newName)
+      const fileNode = getFileDataByKey(oldKey) as FileNode
+      fileNode.key = [...oldKey.split('/').slice(0, -1), newName].join('/')
+      fileNode.label = newName
+      deepUpdateFileKey(currentContextmenuCopy.value, oldKey, fileNode.key)
+    }
+    elTreeRef.value?.setData(rootFiles.value)
+    currentContextmenuCopy.value = null
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+function deepUpdateFileKey (fileNode: FileNode, oldKey: string, newKey: string) {
+  if (!fileNode.children) return
+  fileNode.children.forEach((item) => {
+    if (item.leaf) {
+      updateFileKey(item.key, oldKey, newKey)
+      item.key = item.key!.replace(oldKey, newKey)
+    } else {
+      deepUpdateFileKey(item, oldKey, newKey)
+    }
+  })
 }
 
 function deleteFileBeforeFn () {
@@ -267,22 +347,22 @@ async function deleteFileFn () {
         await parentFileNode.file.removeEntry(fileHandle.name, { recursive: true })
       }
     }
+    const parentFileNode = getParentFileDataByKey(currentContextmenuCopy.value.key) as FileNode
+    if (!parentFileNode) return
+    const findIndex = parentFileNode.children?.findIndex(x => x.key === currentContextmenuCopy.value!.key)
+    if (findIndex !== undefined && findIndex > -1) {
+      parentFileNode.children?.splice(findIndex, 1)
+    }
+    if (currentContextmenuCopy.value.leaf) {
+      removeFileTab(currentContextmenuCopy.value.key)
+    } else {
+      deepRemoveFileTab(currentContextmenuCopy.value)
+    }
+    elTreeRef.value?.setData(rootFiles.value)
+    currentContextmenuCopy.value = null
   } catch (error) {
     console.log(error)
   }
-  const parentFileNode = getParentFileDataByKey(currentContextmenuCopy.value.key) as FileNode
-  if (!parentFileNode) return
-  const findIndex = parentFileNode.children?.findIndex(x => x.key === currentContextmenuCopy.value!.key)
-  if (findIndex !== undefined && findIndex > -1) {
-    parentFileNode.children?.splice(findIndex, 1)
-  }
-  if (currentContextmenuCopy.value.leaf) {
-    removeFileTab(currentContextmenuCopy.value.key)
-  } else {
-    deepRemoveFileTab(currentContextmenuCopy.value)
-  }
-  elTreeRef.value?.setData(rootFiles.value)
-  currentContextmenuCopy.value = null
 }
 
 function deepRemoveFileTab (fileNode: FileNode) {

@@ -44,23 +44,40 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
     }
   }
 
+  function updateFileKeyAndLabel (key: string, label: string) {
+    const fileNode = getFileNodeByKey(key)
+    if (!fileNode) return
+    fileNode.key = fileNode.key!.replace(fileNode.label, label)
+    fileNode.label = label
+  }
+
+  function updateFileKey (key: string, oldKey: string, newKey: string) {
+    const fileNode = getFileNodeByKey(key)
+    if (!fileNode) return
+    fileNode.key = fileNode.key!.replace(oldKey, newKey)
+  }
+
   function updateFileTabsFileContent (key: string, fileContent: string) {
     const fileNode = getFileNodeByKey(key)
+    if (!fileNode) return
     fileNode!.fileContent = fileContent
   }
 
   function updateFileTabsFileEditStatus (key: string, editStatus: boolean) {
     const fileNode = getFileNodeByKey(key)
+    if (!fileNode) return
     fileNode!.editStatus = editStatus
   }
 
   function updateFileTabsFileClosePreview (key: string, closePreview: boolean) {
     const fileNode = getFileNodeByKey(key)
+    if (!fileNode) return
     fileNode!.closePreview = closePreview
   }
 
   function updateFileTabsScroll (key: string, scroll: { left: number, top: number }) {
     const fileNode = getFileNodeByKey(key)
+    if (!fileNode) return
     fileNode!.scroll = scroll
   }
 
@@ -105,6 +122,8 @@ export const useFileTabsStore = defineStore('fileTabsStore', () => {
     setFileTabs,
     addFileTab,
     removeFileTab,
+    updateFileKeyAndLabel,
+    updateFileKey,
     updateFileTabsFileContent,
     updateFileTabsFileEditStatus,
     updateFileTabsFileClosePreview,

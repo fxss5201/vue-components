@@ -72,9 +72,20 @@ const ruleForm = ref<FileAddForm>({
   fileType: ''
 })
 
+const validateFileName = (rule: any, value: any, callback: any) => {
+  if (value === '') {
+    callback(new Error('请输入名称'))
+  } else {
+    if (/^[a-zA-Z_\u4e00-\u9fa5.-][a-zA-Z0-9_\u4e00-\u9fa5.-]*(?=\.[^.]+$|$)/.test(value)) {
+      callback()
+    } else {
+      callback(new Error('名称只能包含数字、字母、下划线、中文、点和减号，且不能以数字或点开头或结尾，不需要包含类型后缀'))
+    }
+  }
+}
 const rules = reactive<FormRules<FileAddForm>>({
   name: [
-    { required: true, message: '请输入名称', trigger: 'blur' }
+    { validator: validateFileName, trigger: 'blur' }
   ],
   fileType: [
     { required: true, message: '请选择类型', trigger: 'change' }
