@@ -16,6 +16,8 @@
     :filter-method="filterMethod"
     @node-click="fileNodeClickFn"
     @node-contextmenu="fileNodeContextmenuFn"
+    @node-expand="onNodeExpand"
+    @node-collapse="onNodeCollapse"
     :height="fileViewContentHeight - 52"
     empty-text="请选择文件夹"
   >
@@ -91,7 +93,8 @@ const { addFileTab } = useFileTabsStore()
 
 const elTreeRef = ref<typeof ElTreeV2>()
 defineExpose({
-  elTreeRef
+  elTreeRef,
+  setTreeData
 })
 
 const props = {
@@ -197,8 +200,24 @@ const filterMethod = (query: string, node: TreeNodeData) => node.label!.toLowerC
 
 function updateTreeCurentFn (key: string) {
   elTreeRef.value?.setCurrentKey(key)
-  elTreeRef.value?.setExpandedKeys(getExpandedKeys(key))
+  const nowExpandedKeys = [...new Set([...expandedKeys.value, ...getExpandedKeys(key)])]
+  elTreeRef.value?.setExpandedKeys(nowExpandedKeys)
   elTreeRef.value?.scrollToNode(key)
+}
+
+const expandedKeys = ref<string[]>([])
+function setTreeData (data: FileNode[]) {
+  if (!data.length) expandedKeys.value = []
+  elTreeRef.value?.setData(data)
+}
+function onNodeExpand (data: TreeNodeData) {
+  if (data.leaf) return
+  if (!expandedKeys.value.includes(data.key)) {
+    expandedKeys.value.push(data.key)
+  }
+}
+function onNodeCollapse (data: TreeNodeData) {
+  expandedKeys.value = expandedKeys.value.filter(x => x !== data.key)
 }
 
 function getExpandedKeys (key: string) {

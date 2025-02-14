@@ -57,9 +57,9 @@ const fileTreeRef = ref<typeof FileTree>()
 
 async function selectDirectoryFn() {
   resetDirectoryStoreFn()
-  fileTreeRef.value?.elTreeRef.setData(rootFiles.value)
+  fileTreeRef.value?.setTreeData(rootFiles.value)
   await selectDirectoryStoreFn()
-  fileTreeRef.value?.elTreeRef.setData(rootFiles.value)
+  fileTreeRef.value?.setTreeData(rootFiles.value)
   nextTick(() => {
     fileTreeRef.value?.elTreeRef.setExpandedKeys([rootFiles.value[0].key])
   })

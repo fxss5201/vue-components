@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, nextTick, onMounted, onUpdated } from 'vue'
+import { ref, watch, computed, nextTick, onUpdated } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 import { ArrowRight } from '@element-plus/icons-vue'
@@ -58,6 +58,7 @@ watch(
       fileType.value = fileTabsCurrent.value!.label.split('.').pop() || ''
       keysArr.value = fileTabsCurrent.value!.key.split('/').filter(x => x)
       fileIcon.value = getIconForFile(fileTabsCurrent.value!.label.split('.').pop() as string) as string
+      getScrollLeftMax()
     }
   },
   { deep: true }
@@ -96,16 +97,13 @@ function scrollFn (e: { scrollLeft: number }) {
 
 function getScrollLeftMax () {
   nextTick(() => {
-    const scrollbarWrap = scrollbarRef.value!.$el.querySelector('.el-scrollbar__wrap')
+    const scrollbarWrap = scrollbarRef.value?.$el.querySelector('.el-scrollbar__wrap')
+    if (!scrollbarWrap) return
     scrollLeftMax.value = scrollbarWrap.scrollWidth - scrollbarWrap.offsetWidth
     scrollLeft.value = scrollLeftMax.value
     scrollbarRef.value?.setScrollLeft(scrollLeft.value)
   })
 }
-
-onMounted(() => {
-  getScrollLeftMax()
-})
 
 onUpdated(() => {
   getScrollLeftMax()
