@@ -20,6 +20,11 @@ export interface FileNode {
 
 export interface FileAddForm {
   name: string
-  type: string
+  fileType?: string
+}
+
+export interface FileAddDataType {
+  name: string
+  type: 'file' | 'directory'
   fileType?: string
 }

@@ -22,7 +22,7 @@
     empty-text="请选择文件夹"
   >
     <template #default="{ node, data }">
-      <div class="file-tree-node">
+      <div class="file-tree-node" @mouseover="fileTreeNodemouseOverFn">
         <template v-if="data.leaf">
           <el-image :src="`./icons/${data.fileIcon}`" alt="file" class="file-icon">
             <template #placeholder>
@@ -60,10 +60,28 @@
     </template>
   </el-tree-v2>
 
+  <el-popover
+    ref="popoverRef"
+    :virtual-ref="buttonRef"
+    trigger="contextmenu"
+    title=""
+    placement="right-start"
+    virtual-triggering
+    popper-class="file-tree-popover"
+    popper-style="padding: 0px;"
+    @show="popoverShowFn"
+    @hide="popoverHideFn"
+    :hide-after="0"
+    :offset="0"
+  >
+    <ButtonList :list="buttonList" @click="buttonListClickFn"></ButtonList>
+  </el-popover>
+
   <FileAdd
     v-if="fileAddVisible"
     :visible="fileAddVisible"
-    :fileNode="(currentContextmenuDirectory as FileNode)"
+    :fileNode="(currentContextmenu as FileNode)"
+    :addType="currentContextmenuType"
     @close="fileAddCloseFn"
     @confirm="fuleAddConfirmFn"></FileAdd>
 </template>
@@ -73,15 +91,17 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-icons-js'
 
 import { ArrowRight } from '@element-plus/icons-vue'
-import { ElMessage, ElTreeV2 } from 'element-plus'
+import { ElMessage, ElTreeV2, ElMessageBox } from 'element-plus'
 import type { TreeNodeData } from 'element-plus/es/components/tree-v2/src/types.mjs'
 
 import FileAdd from './FileAdd.vue'
-import type { FileNode, FileAddForm } from '@/types/fileView'
+import type { FileNode, FileAddDataType } from '@/types/fileView'
+import ButtonList from '@/components/ButtonList.vue'
+import type { ButtonItemProps } from '@/types/ButtonItemProps.ts'
 
 import { storeToRefs } from 'pinia'
 import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
-import { useFileTreeStore, getFileList, getFileIcon } from '@/stores/fileView/fileTreeStore'
+import { useFileTreeStore, getFileList, getFileIcon, getParentFileDataByKey } from '@/stores/fileView/fileTreeStore'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 
 import { needClickLoadDirectory } from '@/config/fileConfig'
@@ -89,7 +109,7 @@ import { needClickLoadDirectory } from '@/config/fileConfig'
 import { emitter } from '@/composables/mitt'
 
 const { fileViewContentHeight } = storeToRefs(useFileViewLayoutStore())
-const { addFileTab } = useFileTabsStore()
+const { addFileTab, removeFileTab } = useFileTabsStore()
 
 const elTreeRef = ref<typeof ElTreeV2>()
 defineExpose({
@@ -132,18 +152,152 @@ const fileNodeClickFn = async (data: TreeNodeData) => {
   }
 }
 
-let currentContextmenuDirectory = ref<FileNode | null>(null)
-const fileNodeContextmenuFn = (e: Event, data: TreeNodeData) => {
-  console.log(e, data)
-  if (data.leaf) {
-    return
+const currentContextmenu = ref<FileNode | null>(null)
+const currentContextmenuCopy = ref<FileNode | null>(null)
+const currentContextmenuType = ref<'file' | 'directory'>('file')
+const buttonRef = ref()
+const popoverRef = ref()
+const fileTreePopoverShow = ref(false)
+const buttonList = ref<ButtonItemProps[]>([])
+const fileButtonList = ref<ButtonItemProps[]>([
+  {
+    key: 'addFile',
+    name: '在同级新增文件'
+  },
+  {
+    key: 'addDirectory',
+    name: '在同级新增文件夹'
+  },
+  {
+    key: 'deleteFile',
+    name: '删除文件'
   }
-  currentContextmenuDirectory.value = data as FileNode
-  fileAddVisible.value = true
+])
+const directoryButtonList = ref<ButtonItemProps[]>([
+  {
+    key: 'addFile',
+    name: '新增文件'
+  },
+  {
+    key: 'addDirectory',
+    name: '新增文件夹'
+  },
+  {
+    key: 'deleteDirectory',
+    name: '删除文件夹'
+  }
+])
+const fileNodeContextmenuFn = (e: Event, data: TreeNodeData) => {
+  console.log(data)
+  if (data.leaf) {
+    buttonList.value = fileButtonList.value
+    currentContextmenu.value = getParentFileDataByKey(data.key) as FileNode
+  } else {
+    buttonList.value = directoryButtonList.value
+    currentContextmenu.value = data as FileNode
+  }
+  currentContextmenuCopy.value = data as FileNode
+}
+const fileTreeNodemouseOverFn = (e: MouseEvent) => {
+  if (fileTreePopoverShow.value) popoverRef.value?.hide()
+  buttonRef.value = e.currentTarget || e.target
+}
+const popoverShowFn = () => {
+  fileTreePopoverShow.value = true
+}
+const popoverHideFn = () => {
+  fileTreePopoverShow.value = false
+}
+function buttonListClickFn (item: ButtonItemProps) {
+  switch (item.key) {
+    case 'addFile':
+      currentContextmenuType.value = 'file'
+      fileAddVisible.value = true
+      break
+    case 'addDirectory':
+      currentContextmenuType.value = 'directory'
+      fileAddVisible.value = true
+      break
+    case 'deleteFile':
+    case 'deleteDirectory':
+      deleteFileBeforeFn()
+      break
+  }
 }
 
-const addFileFn = async (ruleForm: FileAddForm) => {
-  if (!currentContextmenuDirectory.value) {
+function deleteFileBeforeFn () {
+  const filekey = currentContextmenuCopy.value!.key
+  const fileName = currentContextmenuCopy.value!.label
+  const fileType = currentContextmenuCopy.value!.leaf ? '文件' : '文件夹 及其子内容'
+  ElMessageBox.confirm(
+    `此操作将永久删除 ${filekey}${fileType} , 是否继续删除 ${fileName}${fileType} ？`,
+    '删除提示',
+    {
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      deleteFileFn()
+    })
+    .catch(() => {})
+}
+
+async function deleteFileFn () {
+  if (!currentContextmenuCopy.value) return
+  const fileHandle = currentContextmenuCopy.value.file
+  if (!fileHandle) return
+  try {
+    // @ts-ignore
+    if (fileHandle.remove) {
+      if (currentContextmenuCopy.value.leaf) {
+        // @ts-ignore
+        await fileHandle.remove()
+      } else {
+        // @ts-ignore
+        await fileHandle.remove({ recursive: true })
+      }
+    } else {
+      const parentFileNode = getParentFileDataByKey(currentContextmenuCopy.value.key) as FileNode
+      if (!parentFileNode) return
+      if (currentContextmenuCopy.value.leaf) {
+        // @ts-ignore
+        await parentFileNode.file.removeEntry(fileHandle.name)
+      } else {
+        // @ts-ignore
+        await parentFileNode.file.removeEntry(fileHandle.name, { recursive: true })
+      }
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  const parentFileNode = getParentFileDataByKey(currentContextmenuCopy.value.key) as FileNode
+  if (!parentFileNode) return
+  const findIndex = parentFileNode.children?.findIndex(x => x.key === currentContextmenuCopy.value!.key)
+  if (findIndex !== undefined && findIndex > -1) {
+    parentFileNode.children?.splice(findIndex, 1)
+  }
+  if (currentContextmenuCopy.value.leaf) {
+    removeFileTab(currentContextmenuCopy.value.key)
+  } else {
+    deepRemoveFileTab(currentContextmenuCopy.value)
+  }
+  elTreeRef.value?.setData(rootFiles.value)
+  currentContextmenuCopy.value = null
+}
+
+function deepRemoveFileTab (fileNode: FileNode) {
+  if (!fileNode.children) return
+  fileNode.children.forEach((item) => {
+    if (item.leaf) {
+      removeFileTab(item.key)
+    } else {
+      deepRemoveFileTab(item)
+    }
+  })
+}
+
+const addFileFn = async (ruleForm: FileAddDataType) => {
+  if (!currentContextmenu.value) {
     return
   }
   let fileName = ''
@@ -151,20 +305,20 @@ const addFileFn = async (ruleForm: FileAddForm) => {
   if (ruleForm.type === 'file') {
     fileName = `${ruleForm.name}.${ruleForm.fileType}`
     // @ts-ignore
-    fileHandle = await currentContextmenuDirectory.value.file?.getFileHandle(fileName, {
+    fileHandle = await currentContextmenu.value.file?.getFileHandle(fileName, {
       create: true
     })
   } else {
     fileName = `${ruleForm.name}`
     // @ts-ignore
-    fileHandle = await currentContextmenuDirectory.value.file?.getDirectoryHandle(fileName, {
+    fileHandle = await currentContextmenu.value.file?.getDirectoryHandle(fileName, {
       create: true
     })
   }
-  const fileNodeKey = `${currentContextmenuDirectory.value.key}/${fileName}`
+  const fileNodeKey = `${currentContextmenu.value.key}/${fileName}`
   const fileNode: FileNode = {
     key: fileNodeKey,
-    parentKey: currentContextmenuDirectory.value.key,
+    parentKey: currentContextmenu.value.key,
     label: fileName,
     fileIcon: getFileIcon(fileHandle!),
     folderIcon: getIconForFolder(fileHandle!.name),
@@ -177,18 +331,20 @@ const addFileFn = async (ruleForm: FileAddForm) => {
   } else {
     fileNode.children = []
   }
-  (currentContextmenuDirectory.value as FileNode | null)?.children?.push(fileNode)
+  (currentContextmenu.value as FileNode | null)?.children?.push(fileNode)
   elTreeRef.value?.setData(rootFiles.value)
   elTreeRef.value?.setCurrentKey(fileNodeKey)
+  expandedKeys.value = [...new Set<string>([...expandedKeys.value, currentContextmenu.value.key])]
+  setExpandedKeysAndScrollToNode(fileNodeKey)
 }
 
 const fileAddVisible = ref(false)
 function fileAddCloseFn() {
   fileAddVisible.value = false
 }
-async function fuleAddConfirmFn(ruleForm: FileAddForm) {
+async function fuleAddConfirmFn(ruleForm: FileAddDataType) {
   await addFileFn(ruleForm)
-  currentContextmenuDirectory.value = null
+  currentContextmenu.value = null
   fileAddVisible.value = false
 }
 
@@ -200,6 +356,10 @@ const filterMethod = (query: string, node: TreeNodeData) => node.label!.toLowerC
 
 function updateTreeCurentFn (key: string) {
   elTreeRef.value?.setCurrentKey(key)
+  setExpandedKeysAndScrollToNode(key)
+}
+
+function setExpandedKeysAndScrollToNode (key: string) {
   const nowExpandedKeys = [...new Set([...expandedKeys.value, ...getExpandedKeys(key)])]
   elTreeRef.value?.setExpandedKeys(nowExpandedKeys)
   elTreeRef.value?.scrollToNode(key)

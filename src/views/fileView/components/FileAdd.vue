@@ -13,16 +13,10 @@
       label-width="auto"
       status-icon
     >
-      <el-form-item label="文件/文件夹" prop="type">
-        <el-radio-group v-model="ruleForm.type">
-          <el-radio value="file">文件</el-radio>
-          <el-radio value="directory">文件夹</el-radio>
-        </el-radio-group>
-      </el-form-item>
       <el-form-item label="名称" prop="name">
         <el-input v-model="ruleForm.name" placeholder="请输入名称" />
       </el-form-item>
-      <el-form-item v-if="ruleForm.type === 'file'" label="类型" prop="fileType">
+      <el-form-item v-if="props.addType === 'file'" label="类型" prop="fileType">
         <el-select-v2 v-model="ruleForm.fileType" filterable :options="fileTypeListValue" placeholder="请选择类型"></el-select-v2>
       </el-form-item>
     </el-form>
@@ -36,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { FileNode, FileAddForm } from '@/types/fileView'
+import type { FileNode, FileAddForm, FileAddDataType } from '@/types/fileView'
 import { computed, reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { mdFileTypeList, codeFileTypeList } from '@/config/fileConfig'
@@ -57,6 +51,7 @@ const props = withDefaults(
   defineProps<{
     visible: boolean,
     fileNode: FileNode
+    addType: 'file' | 'directory'
   }>(),
   {
     visible: false
@@ -65,23 +60,19 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   close: [],
-  confirm: [ruleForm: FileAddForm]
+  confirm: [ruleForm: FileAddDataType]
 }>()
 
 const dialogTitle = computed(() => {
-  return `在目录${props.fileNode.key}下新增`
+  return `在目录${props.fileNode.key}下新增${props.addType === 'file' ? '文件' : '文件夹'}`
 })
 
-const ruleForm = reactive<FileAddForm>({
+const ruleForm = ref<FileAddForm>({
   name: '',
-  type: '',
   fileType: ''
 })
 
 const rules = reactive<FormRules<FileAddForm>>({
-  type: [
-    { required: true, message: '请选择文件/文件夹', trigger: 'change' }
-  ],
   name: [
     { required: true, message: '请输入名称', trigger: 'blur' }
   ],
@@ -100,7 +91,10 @@ function handleCloseFn() {
 async function handleConfirmFn() {
   await fileAddFormRef.value!.validate((valid, fields) => {
     if (valid) {
-      emit('confirm', ruleForm)
+      emit('confirm', {
+        ...ruleForm.value,
+        type: props.addType
+      })
     } else {
       console.log('error submit!', fields)
     }
