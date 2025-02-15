@@ -1,7 +1,5 @@
 # vue-components
 
-[国内展示网址](https://www.fxss.work/vue-components/)
-
 其他网址：
 
 - 低代码：<https://www.fxss.work/>
