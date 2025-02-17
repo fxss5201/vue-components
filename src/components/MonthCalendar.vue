@@ -8,7 +8,7 @@
             <el-button>{{ curMonthStr }}</el-button>
             <el-button :icon="ArrowRightBold" @click="increaseMonthFn"></el-button>
           </el-button-group>
-          <el-button class="ml-12" @click="toNowMonthFn">今</el-button>
+          <el-button v-if="shouJinFlag" class="ml-12" @click="toNowMonthFn">今</el-button>
         </slot>
       </div>
       <div class="calendar-head-right">
@@ -76,13 +76,18 @@ const emit = defineEmits<{
   dateItemClick: [value: DateType]
 }>()
 
+const curMonthStrDefault = dayjs().format('YYYY-MM')
 const weekNameList = ref<string[]>([])
 const dateList = ref<DateType[]>([])
-const curMonth = ref(dayjs().format('YYYY-MM'))
+const curMonth = ref(curMonthStrDefault)
 const nowDate = ref(dayjs().format('YYYY-MM-DD'))
 
 const curMonthStr = computed(() => {
   return dayjs(curMonth.value).format(props.titleFormat)
+})
+
+const shouJinFlag = computed(() => {
+  return curMonth.value !== curMonthStrDefault
 })
 
 watch(
@@ -116,7 +121,7 @@ function increaseMonthFn () {
 }
 
 function toNowMonthFn () {
-  curMonth.value = dayjs().format('YYYY-MM')
+  curMonth.value = curMonthStrDefault
   doGetAndEmit()
 }
 

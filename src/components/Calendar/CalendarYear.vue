@@ -6,7 +6,7 @@
         <el-button>{{ props.year }}</el-button>
         <el-button :icon="ArrowRightBold" @click="increaseYear"></el-button>
       </el-button-group>
-      <el-button class="ml-12" @click="toNowYear">今</el-button>
+      <el-button v-if="shouJinFlag" class="ml-12" @click="toNowYear">今</el-button>
     </div>
     <div class="calendar-body">
       <CalendarMonth
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue'
 import CalendarMonth from './CalendarMonth.vue'
 
@@ -39,6 +39,10 @@ interface Props {
   needHoliday?: boolean
   needChinese?: boolean
 }
+
+const shouJinFlag = computed(() => {
+  return props.year !== new Date().getFullYear()
+})
 
 const props = defineProps<Props>()
 const emit = defineEmits(['reduceYear', 'increaseYear', 'toNowYear'])
