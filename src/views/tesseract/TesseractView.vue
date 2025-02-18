@@ -24,6 +24,7 @@
       :on-change="onChangeFn"
       :on-remove="onRemoveFn"
       list-type="text"
+      accept="image/*"
       :file-list="imgList"
       :disabled="tesseractLoading"
     >
