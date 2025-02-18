@@ -53,6 +53,7 @@
     "screenfull": "^6.0.2",
     "shiki": "^1.26.1",
     "splitpanes": "^3.1.5",
+    "tesseract.js": "^6.0.0",
     "vscode-icons-js": "^11.6.1",
     "vue": "^3.4.29",
     "vue-demi": "^0.14.10",

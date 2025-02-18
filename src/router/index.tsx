@@ -145,7 +145,17 @@ export const routes: RouteRecordRaw[] = [
     name: 'TabsScrollView',
     component: () => import('../views/TabsScrollView.vue'),
     meta: {
-      title: 'tabs滚动'
+      title: 'tabs滚动',
+      iconfont: 'icon-tabsScroll'
+    }
+  },
+  {
+    path: '/tesseractView',
+    name: 'TesseractView',
+    component: () => import('../views/tesseract/TesseractView.vue'),
+    meta: {
+      title: '文字识别',
+      iconfont: 'icon-tesseract'
     }
   }
 ]
