@@ -6,6 +6,11 @@
           <el-option v-for="item in tesseractLangList" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </el-form-item>
+      <el-form-item label="选择识别引擎">
+        <el-select v-model="tesseractOem" placeholder="请选择识别引擎">
+          <el-option v-for="item in tesseractOemList" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+      </el-form-item>
       <el-form-item v-if="imgList.length">
         <el-button plain @click="clearImgListFn">清空已选图片</el-button>
       </el-form-item>
@@ -93,8 +98,27 @@ const tesseractLangList = ref([
     value: 'eng + chi_sim'
   }
 ])
+const tesseractOem = ref(Tesseract.OEM.LSTM_ONLY)
+const tesseractOemList = ref([
+  {
+    label: 'LSTM_ONLY',
+    value: Tesseract.OEM.LSTM_ONLY
+  },
+  {
+    label: 'TESSERACT_ONLY',
+    value: Tesseract.OEM.TESSERACT_ONLY
+  },
+  {
+    label: 'TESSERACT_LSTM_COMBINED',
+    value: Tesseract.OEM.TESSERACT_LSTM_COMBINED
+  },
+  {
+    label: 'DEFAULT',
+    value: Tesseract.OEM.DEFAULT
+  }
+])
 watch(
-  () => tesseractLang.value,
+  () => [tesseractLang.value, tesseractOem.value],
   () => {
     destoryTesseract()
     initTesseract(tesseractLang.value === 'eng + chi_sim' ? ['eng', 'chi_sim'] : [tesseractLang.value])
@@ -131,10 +155,10 @@ const worker = ref<Tesseract.Worker>()
 const tesseractMinUrl = new URL('./tesseract.min.js', import.meta.url).href
 const tesseractWasmUrl = new URL('./tesseract-core-simd-lstm.wasm.js', import.meta.url).href
 async function initTesseract (langs?: string[]) {
-  worker.value = await createWorker(langs, Tesseract.OEM.DEFAULT, {
+  worker.value = await createWorker(langs, tesseractOem.value, {
     corePath: tesseractWasmUrl,
     workerPath: tesseractMinUrl,
-    langPath: '/tesseract/lang-data/',
+    langPath: new URL('/tesseract/lang-data/', import.meta.url).href,
     logger: m => {
       console.log(m)
       tesseractLoadingText.value = m.status
