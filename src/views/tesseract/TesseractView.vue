@@ -148,7 +148,7 @@ async function tesseractImg () {
   for (let idx  = 0; idx < imgList.value.length; idx++) {
     const item = imgList.value[idx]
     if (!item.content) {
-      const res = await worker.value?.recognize(item.raw)
+      const res = await worker.value?.recognize(item.raw!)
       console.log(res)
       item.content = res?.data.text || ''
       console.log(res?.data.text)
