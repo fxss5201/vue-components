@@ -62,13 +62,15 @@ const props = withDefaults(
     rightIconfont?: string
     iconSize?: string | number
     scrollSpeed?: number
+    delayTime?: number
   }>(),
   {
     background: '#fffbe8',
     leftText: '公告',
     leftIconfont: 'icon-notice',
     iconSize: 16,
-    scrollSpeed: 1 // requestAnimationFrame 滚动的距离
+    scrollSpeed: 1, // requestAnimationFrame 滚动的距离
+    delayTime: 1888 // 滚动开始结束时的延迟时间
   }
 )
 
@@ -86,17 +88,17 @@ const scrollTimer = ref<number | null>()
 const scrollValue = ref(0)
 const mouseenterFn = ref<Function | null>()
 const mouseleaveFn = ref<Function | null>()
+const timer = ref<number>(0)
 
 onMounted(() => {
   nextTick(() => {
-    doScrollFn()
+    debouncedFn()
   })
 })
 
 onUpdated(() => {
   nextTick(() => {
-    doCancleScrollFn()
-    doScrollFn()
+    debouncedFn()
   })
 })
 
@@ -120,14 +122,34 @@ function doScrollFn () {
   const noticeBarOffsetWidth = noticeBarWrap.offsetWidth
   emits('canScrollChange', noticeBarScrollWidth > noticeBarOffsetWidth)
   if (noticeBarScrollWidth > noticeBarOffsetWidth) {
+    let scrollSpeed = 0
+    timer.value = 0
+    const delayTime = props.delayTime
+    const scrollValueMax = noticeBarScrollWidth - noticeBarOffsetWidth
     const scrollFn = () => {
-      scrollValue.value += props.scrollSpeed
-      if (scrollValue.value >= noticeBarScrollWidth - noticeBarOffsetWidth) {
-        emits('scrollEnd')
-        scrollValue.value = 0
-        nextTick(() => {
+      scrollValue.value += scrollSpeed
+      const nowTime = new Date().getTime()
+      if ((scrollValue.value === 0 || scrollValue.value >= scrollValueMax) && timer.value === 0) {
+        timer.value = nowTime
+        scrollSpeed = 0
+        if (scrollValue.value >= scrollValueMax) {
+          emits('scrollEnd')
+        }
+      } else if ((scrollValue.value === 0 || scrollValue.value >= scrollValueMax) && nowTime - timer.value > delayTime) {
+        scrollSpeed = props.scrollSpeed
+        timer.value = 0
+        if (scrollValue.value === 0) {
           emits('scrollStart')
-        })
+        }
+        if (scrollValue.value >= scrollValueMax) {
+          scrollValue.value = 0
+          timer.value = nowTime
+          scrollSpeed = 0
+        }
+      }
+      if (scrollValue.value > 0 && scrollValue.value < scrollValueMax && scrollSpeed === 0) {
+        scrollSpeed = props.scrollSpeed
+        timer.value = 0
       }
       scrollbarRef.value?.setScrollLeft(scrollValue.value)
       if (isScroll.value) {
@@ -139,7 +161,6 @@ function doScrollFn () {
         }
       }
     }
-    emits('scrollStart')
     scrollFn()
   
     mouseenterFn.value = () => {
