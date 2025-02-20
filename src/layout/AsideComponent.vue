@@ -7,12 +7,12 @@
         :collapse="menuCollapse"
         class="el-menu-vertical-aside"
       >
-        <template v-for="item in routes" :key="item.path">
+        <template v-for="item in routesMenu" :key="item.path">
           <el-sub-menu v-if="item.children && item.children.length" :index="item.path">
             <template #title>
               <el-icon v-if="item.meta?.icon || item.meta?.iconfont">
                 <component v-if="item.meta?.icon" :is="item.meta?.icon" />
-                <IconSvg v-else-if="item.meta?.iconfont" :icon="item.meta?.iconfont as string" size="18px"></IconSvg>
+                <IconSvg v-else-if="item.meta?.iconfont" :icon="(item.meta?.iconfont as string)" size="18px"></IconSvg>
               </el-icon>
               <span>{{ item.meta?.title }}</span>
             </template>
@@ -27,7 +27,7 @@
           <el-menu-item v-else :index="item.path">
             <el-icon v-if="item.meta?.icon || item.meta?.iconfont">
               <component v-if="item.meta?.icon" :is="item.meta?.icon" />
-              <IconSvg v-else-if="item.meta?.iconfont" :icon="item.meta?.iconfont as string" size="18px"></IconSvg>
+              <IconSvg v-else-if="item.meta?.iconfont" :icon="(item.meta?.iconfont as string)" size="18px"></IconSvg>
             </el-icon>
             <span>{{ item.meta?.title }}</span>
           </el-menu-item>
@@ -45,6 +45,7 @@ import { storeToRefs } from 'pinia'
 import IconSvg from '@/components/IconSvg.vue'
 
 const route = useRoute()
+const routesMenu = routes.filter(x => x.meta?.hideInAside !== true)
 const { menuCollapse } = storeToRefs(useMenuCollapseStore())
 </script>
 

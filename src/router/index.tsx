@@ -132,6 +132,26 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/terminalView',
+    name: 'TerminalView',
+    component: () => import('../views/terminal/TerminalView.vue'),
+    meta: {
+      title: '终端',
+      iconfont: 'icon-terminal'
+    }
+  },
+  {
+    path: '/previewView',
+    name: 'PreviewView',
+    component: () => import('../views/PreviewView.vue'),
+    meta: {
+      title: '预览',
+      hideInAside: true,
+      noLayout: true,
+      noPadding: true
+    }
+  },
+  {
     path: '/codePage',
     name: 'CodePage',
     component: () => import('../views/CodePage.vue'),

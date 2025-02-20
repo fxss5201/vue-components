@@ -48,6 +48,10 @@ export default defineConfig({
         ws: true
       }
     },
-    open: true
+    open: true,
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'credentialless',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+    }
   }
 })

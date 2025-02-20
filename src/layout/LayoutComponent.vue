@@ -66,8 +66,6 @@ import AsideComponent from '@/layout/AsideComponent.vue'
 import IconSvg from '@/components/IconSvg.vue'
 import { useMenuCollapseStore } from '@/stores/menuCollapse'
 import { storeToRefs } from 'pinia'
-import { useNProgress } from '@vueuse/integrations/useNProgress'
-import 'nprogress/nprogress.css'
 import { useKeepAliveStore } from '@/stores/KeepAliveStore'
 
 const menuCollapseStore = useMenuCollapseStore()
@@ -75,23 +73,11 @@ const { menuCollapse } = storeToRefs(menuCollapseStore)
 const route = useRoute()
 const router = useRouter()
 const keepAliveStore = useKeepAliveStore()
-const { addComponentName } = keepAliveStore
 const { componentNames } = storeToRefs(keepAliveStore)
 
-const { start: startNProgress, done: doneNProgress } = useNProgress()
-
-router.beforeEach((to, from, next) => {
-  if (to.meta?.keepAlive) {
-    addComponentName(to.name as string)
-  }
-  startNProgress()
-  next()
-})
 const layoutMainRef = ref<HTMLDivElement>()
 router.afterEach((to, from) => {
-  document.title = `${to.meta.title as string} | vue-components`
-  layoutMainRef.value!.scrollTo(0, 0)
-  doneNProgress()
+  layoutMainRef.value?.scrollTo(0, 0)
 })
 </script>
 
