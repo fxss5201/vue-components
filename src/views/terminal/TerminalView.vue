@@ -1,7 +1,7 @@
 <template>
   <div class="page-box">
     <div class="page-head">
-      <div style="margin-bottom: 8px;">请先选择项目打开，等项目加载好了之后，进行项目安装，然后正常起项目，成功之后可以在当前页面或者新的Tab页进行预览。由于 github page 无法设置 headers，此页面完整体验请去 <a href="https://fxss-vue-components.netlify.app/#/terminalView" class="a-class" target="_blank">终端体验</a> 。</div>
+      <div style="margin-bottom: 8px;">请先选择项目打开，等项目加载好了之后，进行项目安装，然后正常起项目，成功之后可以在当前页面或者新的Tab页进行预览。</div>
       <el-button plain @click="openFolderFn">打开项目</el-button>
       <el-button v-if="serverUrl" plain @click="openPreviewFn">新Tab页预览</el-button>
     </div>
@@ -101,9 +101,6 @@ async function convertDirectoryHandleToFiles(directoryHandle: FileSystemDirector
     flex: 0 0 auto;
     height: 80px;
     border-bottom: 1px solid var(--el-border-color);
-  }
-  .a-class {
-    color: var(--el-color-primary);
   }
   .page-body {
     flex: auto;
