@@ -39,8 +39,6 @@ import c from 'chalk'
 import { ElMessage } from 'element-plus'
 import CodeCard from '@/components/CodeCard.vue'
 
-const isProd = ref(import.meta.env.PROD)
-
 const mountFiles = ref<FileSystemTree>()
 const terminalCardRef = ref<typeof TerminalCard>()
 const isSelectFolder = ref(false)
@@ -80,7 +78,7 @@ async function readyFn () {
 }
 
 function openPreviewFn () {
-  window.open(`${location.origin}${location.pathname}#/previewView?serverUrl=${serverUrl.value}`, '_blank')
+  window.open(`${location.origin}/previewView?serverUrl=${serverUrl.value}`, '_blank')
 }
 
 async function convertDirectoryHandleToFiles(directoryHandle: FileSystemDirectoryHandle) {
