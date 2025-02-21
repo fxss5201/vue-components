@@ -19,6 +19,12 @@ import markdownItIns from 'markdown-it-ins'
 import markdownItMark from 'markdown-it-mark'
 // @ts-ignore
 import markdownItLinkAttributes from 'markdown-it-link-attributes'
+// @ts-ignore
+import markdownItAnchor from 'markdown-it-anchor'
+// @ts-ignore
+import markdownItTocDoneRight from 'markdown-it-toc-done-right'
+// @ts-ignore
+import uslug from 'uslug'
 
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark-dimmed.min.css'
@@ -67,6 +73,17 @@ md.use(markdownItAbbr)
 md.use(emoji)
 md.use(markdownItIns)
 md.use(markdownItMark)
+
+function uslugify(s: any) {
+  return uslug(s)
+}
+
+md.use(markdownItAnchor, { permalink: true, permalinkBefore: true, permalinkSymbol: '§', slugify: uslugify, level: 2 } )
+md.use(markdownItTocDoneRight, {
+  placeholder: '\\[toc\\]',
+  slugify: uslugify,
+  level: 2
+})
 
 function tableStylePlugin () {
   md.renderer.rules.table_open = function() {

@@ -17,7 +17,8 @@ const props = withDefaults(
 )
 
 const markdown = ref('')
-markdown.value = useMarkdown(props.content).html.value
+markdown.value = useMarkdown(`[toc]
+${props.content}`).html.value
 
 watch(
   () => props.content,
