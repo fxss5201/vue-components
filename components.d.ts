@@ -51,6 +51,7 @@ declare module 'vue' {
     SimpleSwiper: typeof import('./src/components/SimpleSwiper.vue')['default']
     TabsScroll: typeof import('./src/components/TabsScroll.vue')['default']
     TerminalCard: typeof import('./src/components/TerminalCard.vue')['default']
+    TerminalCardCopy: typeof import('./src/components/TerminalCardCopy.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']
