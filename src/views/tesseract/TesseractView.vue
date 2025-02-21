@@ -159,7 +159,7 @@ async function initTesseract (langs?: string[]) {
   worker.value = await createWorker(langs, tesseractOem.value, {
     corePath: tesseractWasmUrl,
     workerPath: tesseractMinUrl,
-    langPath: new URL('/tesseract/lang-data/', import.meta.url).href,
+    langPath: new URL('/tesseract/lang-data', import.meta.url).href,
     logger: m => {
       console.log(m)
       tesseractLoadingText.value = m.status
