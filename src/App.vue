@@ -54,6 +54,7 @@ router.afterEach((to, from) => {
 <style lang="scss">
 .full-page {
   min-height: 100vh;
+  font-size: 0;
 }
 
 .splitpanes {
