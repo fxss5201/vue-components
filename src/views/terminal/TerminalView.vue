@@ -1,14 +1,26 @@
 <template>
   <div class="page-box">
     <div class="page-head">
-      <div style="margin-bottom: 8px;">请先选择项目打开，等项目加载好了之后，进行项目安装，然后正常起项目，成功之后可以在当前页面或者新的Tab页进行预览。由于 github page 无法设置 headers，此页面完整体验请去 <a href="https://fxss-vue-components.netlify.app/#/terminalView" class="a-class" target="_blank">终端体验</a> 。</div>
-      <el-button plain @click="openFolderFn">打开项目</el-button>
+      <div style="margin-bottom: 8px;">请先选择项目打开，等项目加载好了之后，进行项目安装，然后正常起项目，成功之后可以在当前页面或者新的Tab页进行预览。
+        <template v-if="isProd">由于 github page 无法设置 headers，此页面完整体验请去 <a href="https://fxss-vue-components.netlify.app/#/terminalView" class="a-class" target="_blank">终端体验</a>。</template>
+      </div>
+      <el-button v-if="!isSelectFolder" plain @click="openFolderFn">打开项目</el-button>
+      <el-button v-else plain @click="reloadPageFn">重新加载</el-button>
       <el-button v-if="serverUrl" plain @click="openPreviewFn">新Tab页预览</el-button>
     </div>
     <div v-if="isSelectFolder" class="page-body">
       <Splitpanes horizontal :dbl-click-splitter="false">
         <Pane size="80" min-size="50">
-          <iframe v-if="serverUrl" :src="serverUrl" style="width: 100%;height: 100%;" frameborder="0"></iframe>
+          <Splitpanes :dbl-click-splitter="false" :push-other-panes="false" style="height: calc(calc(100vh - 176px) * 0.8);">
+            <Pane size="25" min-size="20">
+              <el-scrollbar height="100%" style="width: 100%;">
+                <CodeCard v-model="code" lang="json"></CodeCard>
+              </el-scrollbar>
+            </Pane>
+            <Pane size="75" min-size="30">
+              <iframe v-if="serverUrl" :src="serverUrl" style="width: 100%;height: 100%;" frameborder="0"></iframe>
+            </Pane>
+          </Splitpanes>
         </Pane>
         <Pane size="20" min-size="18">
           <TerminalCard ref="terminalCardRef" @ready="readyFn" @server="serverFn"></TerminalCard>
@@ -27,6 +39,9 @@ import TerminalCard from '@/components/TerminalCard.vue'
 import { type FileSystemTree } from '@webcontainer/api'
 import c from 'chalk'
 import { ElMessage } from 'element-plus'
+import CodeCard from '@/components/CodeCard.vue'
+
+const isProd = ref(import.meta.env.PROD)
 
 const mountFiles = ref<FileSystemTree>()
 const terminalCardRef = ref<typeof TerminalCard>()
@@ -35,6 +50,7 @@ const serverUrl = ref('')
 function serverFn (url: string) {
   serverUrl.value = url
 }
+const code = ref('')
 
 async function openFolderFn () {
   // @ts-ignore
@@ -55,9 +71,14 @@ async function openFolderFn () {
   }
 }
 
-function readyFn () {
+function reloadPageFn () {
+  window.location.reload()
+}
+
+async function readyFn () {
   terminalCardRef.value?.webContainer.mount(mountFiles.value)
   terminalCardRef.value?.terminal.writeln(c.green(`Project loading completed.`))
+  code.value = await terminalCardRef.value!.webContainer.fs.readFile('/package.json', 'utf-8')
 }
 
 function openPreviewFn () {

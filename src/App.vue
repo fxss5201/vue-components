@@ -68,7 +68,7 @@ router.afterEach((to, from) => {
     position: relative;
   }
   &.splitpanes--vertical {
-    .splitpanes__splitter {
+    & > .splitpanes__splitter {
       width: 1px;
       padding: 0 1px;
       &:before {
@@ -77,7 +77,7 @@ router.afterEach((to, from) => {
     }
   }
   &.splitpanes--horizontal {
-    .splitpanes__splitter {
+    & > .splitpanes__splitter {
       height: 1px;
       padding: 1px 0;
       &:hover {

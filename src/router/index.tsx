@@ -136,6 +136,7 @@ export const routes: RouteRecordRaw[] = [
     name: 'TerminalView',
     component: () => import('../views/terminal/TerminalView.vue'),
     meta: {
+      keepAlive: true,
       title: '终端',
       iconfont: 'icon-terminal'
     }
