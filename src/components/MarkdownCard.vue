@@ -17,13 +17,15 @@ const props = withDefaults(
 )
 
 const markdown = ref('')
-markdown.value = useMarkdown(`[toc]
-${props.content}`).html.value
+function addToc (val: string) {
+  return val.includes('[toc]') ? val : `[toc]\n${val}`
+}
+markdown.value = useMarkdown(addToc(props.content)).html.value
 
 watch(
   () => props.content,
   () => {
-    markdown.value = useMarkdown(props.content).html.value
+    markdown.value = useMarkdown(addToc(props.content)).html.value
   },
   {
     immediate: true
@@ -37,6 +39,18 @@ useCodeCopy()
 .markdown-body {
   pre + pre {
     margin-top: 1em;
+  }
+
+  .table-of-contents {
+    position: fixed;
+    right: 24px;
+    z-index: 1000;
+    background-color: #fff;
+    a {
+      &:hover {
+        color: var(--el-color-primary);
+      }
+    }
   }
   :not(pre) > code {
     word-break: break-word;
@@ -60,8 +74,23 @@ useCodeCopy()
       padding: 6px 8px;
     }
   }
-  a {
+  a.blank-link {
     color: var(--el-color-primary);
+  }
+  a.cur-link {
+    &:hover {
+      color: var(--el-color-primary);
+    }
+  }
+  h1, h2, h3, h4, h5, h6 {
+    &:hover {
+      a.cur-link {
+        color: var(--el-color-primary);
+      }
+    }
+  }
+  .iconfont::before {
+    margin-right: 3px;
   }
 }
 </style>

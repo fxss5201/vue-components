@@ -57,12 +57,26 @@ const md: MarkdownIt = new markdownIt({
   }
 } as Options)
 
-md.use(markdownItLinkAttributes, {
-  attrs: {
-    target: "_blank",
-    rel: "noopener",
+md.use(markdownItLinkAttributes, [
+  {
+    matcher(href: string) {
+      return href.startsWith('https:') || href.startsWith('http:')
+    },
+    attrs: {
+      target: '_blank',
+      class: 'iconfont icon-new-link blank-link',
+      rel: 'noopener',
+    },
   },
-})
+  {
+    matcher(href: string) {
+      return href.startsWith('#')
+    },
+    attrs: {
+      class: 'cur-link'
+    },
+  }
+])
 md.use(tableStylePlugin)
 md.use(codeStylePlugin)
 md.use(markdownItSub)
@@ -78,7 +92,7 @@ function uslugify(s: any) {
   return uslug(s)
 }
 
-md.use(markdownItAnchor, { permalink: true, permalinkBefore: true, permalinkSymbol: '§', slugify: uslugify, level: 2 } )
+md.use(markdownItAnchor, { permalink: true, permalinkBefore: true, permalinkSymbol: '#', slugify: uslugify, level: 1 } )
 md.use(markdownItTocDoneRight, {
   placeholder: '\\[toc\\]',
   slugify: uslugify,
