@@ -52,9 +52,10 @@ const { menuCollapse } = storeToRefs(useMenuCollapseStore())
 <style scoped lang="scss">
 .aside-box {
   height: 100%;
+  border-right: 1px solid var(--el-menu-border-color);
 }
 .el-menu-vertical-aside {
-  height: calc(100vh - 60px);
+  border-right: 0;
   &:not(.el-menu--collapse) {
     width: 200px;
   }
