@@ -169,14 +169,14 @@ export const routes: RouteRecordRaw[] = [
           title: '代码编辑'
         }
       },
-      {
-        path: '/codeEditor/monaco-editor-page',
-        name: 'MonacoEditorPage',
-        component: () => import('../views/codeEditor/MonacoEditorPage.vue'),
-        meta: {
-          title: 'monaco-editor'
-        }
-      }
+      // {
+      //   path: '/codeEditor/monaco-editor-page',
+      //   name: 'MonacoEditorPage',
+      //   component: () => import('../views/codeEditor/MonacoEditorPage.vue'),
+      //   meta: {
+      //     title: 'monaco-editor'
+      //   }
+      // }
     ]
   },
   {
