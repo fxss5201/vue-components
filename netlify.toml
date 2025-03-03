@@ -1,6 +1,3 @@
-[build]
-command = "node --max-old-space-size=4096 vite build"
-
 [[headers]]
   for = "/*"
   [headers.values]
