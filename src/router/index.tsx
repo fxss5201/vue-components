@@ -153,13 +153,31 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/codePage',
-    name: 'CodePage',
-    component: () => import('../views/CodePage.vue'),
+    path: '/codeEditor',
+    name: 'CodeEditor',
+    redirect: '/codeEditor/codePage',
     meta: {
       title: '代码编辑',
       iconfont: 'icon-code'
-    }
+    },
+    children: [
+      {
+        path: '/codeEditor/codePage',
+        name: 'CodePage',
+        component: () => import('../views/codeEditor/CodePage.vue'),
+        meta: {
+          title: '代码编辑'
+        }
+      },
+      {
+        path: '/codeEditor/monaco-editor-page',
+        name: 'MonacoEditorPage',
+        component: () => import('../views/codeEditor/MonacoEditorPage.vue'),
+        meta: {
+          title: 'monaco-editor'
+        }
+      }
+    ]
   },
   {
     path: '/tabsScrollView',

@@ -39,3 +39,4 @@ npm run dev
 - 类vscode实现：浏览器中的代码编辑器，支持新增文件及文件夹
 - 代码编辑：代码编辑功能
 - tabs滚动
+- 文字识别（[tesseract.js](https://github.com/naptha/tesseract.js)）

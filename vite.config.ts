@@ -50,6 +50,7 @@ export default defineConfig({
     },
     open: true,
     headers: {
+      // terminal 终端本地开发时配置
       // 'Cross-Origin-Embedder-Policy': 'credentialless',
       // 'Cross-Origin-Opener-Policy': 'same-origin',
     }
