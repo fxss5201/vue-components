@@ -13,7 +13,7 @@ import topLevelAwait from 'vite-plugin-top-level-await'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/',
+  base: '/vue-components/',
   plugins: [
     vue(),
     vueJsx(),
@@ -51,8 +51,8 @@ export default defineConfig({
     open: true,
     headers: {
       // terminal 终端本地开发时配置
-      // 'Cross-Origin-Embedder-Policy': 'credentialless',
-      // 'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'credentialless',
+      'Cross-Origin-Opener-Policy': 'same-origin',
     }
   }
 })

@@ -1,7 +1,7 @@
 <template>
   <div class="page-box">
     <div class="page-head">
-      <div style="margin-bottom: 8px;">请先选择项目打开，等项目加载好了之后，进行项目安装，然后正常起项目，成功之后可以在当前页面或者新的Tab页进行预览。</div>
+      <div style="margin-bottom: 8px;">请先选择项目打开，等项目加载好了之后，进行项目安装，然后正常起项目，成功之后可以在当前页面或者新的Tab页进行预览。github page 无法设置 header ，可点击去 <a class="link" href="https://fxss-vue-components.netlify.app/" target="_blank">https://fxss-vue-components.netlify.app/</a> 查看。</div>
       <el-button v-if="!isSelectFolder" plain @click="openFolderFn">打开项目</el-button>
       <el-button v-else plain @click="reloadPageFn">重新加载</el-button>
       <el-button v-if="serverUrl" plain @click="openPreviewFn">新Tab页预览</el-button>
@@ -78,7 +78,11 @@ async function readyFn () {
 }
 
 function openPreviewFn () {
-  window.open(`${location.origin}/previewView?serverUrl=${serverUrl.value}`, '_blank')
+  if (location.host === 'fxss-vue-components.netlify.app') {
+    window.open(`${location.origin}/previewView?serverUrl=${serverUrl.value}`, '_blank')
+  } else {
+    window.open(`${location.origin}/vue-components/previewView?serverUrl=${serverUrl.value}`, '_blank')
+  }
 }
 
 async function convertDirectoryHandleToFiles(directoryHandle: FileSystemDirectoryHandle) {
@@ -121,6 +125,10 @@ async function convertDirectoryHandleToFiles(directoryHandle: FileSystemDirector
   }
   .page-body {
     flex: auto;
+  }
+
+  .link {
+    color: var(--el-color-primary);
   }
 }
 </style>
