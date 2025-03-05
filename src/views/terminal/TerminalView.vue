@@ -81,7 +81,7 @@ function openPreviewFn () {
   if (location.host === 'fxss-vue-components.netlify.app') {
     window.open(`${location.origin}/previewView?serverUrl=${serverUrl.value}`, '_blank')
   } else {
-    window.open(`${location.origin}/vue-components/previewView?serverUrl=${serverUrl.value}`, '_blank')
+    window.open(`${location.origin}/vue-components/#/previewView?serverUrl=${serverUrl.value}`, '_blank')
   }
 }
 
