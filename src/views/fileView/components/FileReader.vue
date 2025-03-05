@@ -3,7 +3,8 @@
     <Splitpanes v-if="!fileClosePreview" :dbl-click-splitter="false" :push-other-panes="false">
       <Pane size="50" min-size="20">
         <div class="full-block">
-          <el-scrollbar ref="scrollbarCodeMdRef">
+          <MonacoEditorCard v-if="isMonacoEditor" :key="fileTabsCurrent?.key" :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></MonacoEditorCard>
+          <el-scrollbar v-else ref="scrollbarCodeMdRef">
             <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
           </el-scrollbar>
         </div>
@@ -17,11 +18,15 @@
         </div>
       </Pane>
     </Splitpanes>
-    <el-scrollbar v-else ref="scrollbarCodeMdRef">
-      <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
-    </el-scrollbar>
+    <template v-else>
+      <MonacoEditorCard v-if="isMonacoEditor" :key="fileTabsCurrent?.key" :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></MonacoEditorCard>
+      <el-scrollbar ref="scrollbarCodeMdRef">
+        <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
+      </el-scrollbar>
+    </template>
   </div>
   <div class="file-code-box" v-loading="fileLoading" v-else-if="codeFileTypeList.includes(fileType)">
+    <MonacoEditorCard v-if="isMonacoEditor" :key="fileTabsCurrent?.key" :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></MonacoEditorCard>
     <el-scrollbar ref="scrollbarCodeRef">
       <CodeCard :modelValue="fileReader as string" @update:modelValue="updateModelValueFn" @saveFile="saveFileFn" :lang="fileType" :is-editor="editorPermission" :file="fileTabsCurrent!.file as FileSystemFileHandle"></CodeCard>
     </el-scrollbar>
@@ -63,8 +68,9 @@
 import { nextTick, ref, watch, computed } from 'vue'
 import MarkdownCard from '@/components/MarkdownCard.vue'
 import OfficeFileReader from '@/components/OfficeFileReader.vue'
-import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList, havePreviewFileTypeList } from '@/config/fileConfig'
+import { imgFileTypeList, mdFileTypeList, officeFileTypeList, codeFileTypeList, videoFileTypeList, havePreviewFileTypeList, monacoEditorSupportLanguages, monacoEditorSupportLanguagesMap } from '@/config/fileConfig'
 import CodeCard from '@/components/CodeCard.vue'
+import MonacoEditorCard from '@/components/MonacoEditorCard.vue'
 import JsonView from '@/components/JsonView.vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
@@ -75,6 +81,7 @@ import { useCurrentFileStore } from '@/stores/fileView/currentFileStore'
 import { useFileViewLayoutStore } from '@/stores/fileView/fileViewLayoutStore'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
 import { getParentFileDataByKey } from '@/stores/fileView/fileTreeStore'
+import { ElMessage } from 'element-plus'
 
 const { fileReaderHeight } = storeToRefs(useFileViewLayoutStore())
 const fileTabsStore = useFileTabsStore()
@@ -90,6 +97,9 @@ const fileLoading = ref(false)
 const fileType = ref('')
 const fileReader = ref<FileReader['result']>('')
 const imgFileIndex = ref(0)
+const isMonacoEditor = computed(() => {
+  return monacoEditorSupportLanguages.includes(monacoEditorSupportLanguagesMap[fileType.value] || fileType.value)
+})
 
 const imgUrlList = ref<string[]>([])
 
@@ -199,6 +209,7 @@ function getFileReaderJson (val: string) {
     return json
   } catch (error) {
     console.log(error)
+    ElMessage.error('json文件格式错误')
     return jsonOld.value
   } 
 }

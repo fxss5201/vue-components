@@ -36,7 +36,9 @@ npm run dev
 - 简单swiper
 - Echarts
 - 公告栏
-- 类vscode实现：浏览器中的代码编辑器，支持新增文件及文件夹
-- 代码编辑：代码编辑功能
+- [类vscode实现](https://fxss5201.github.io/vue-components/#/fileView)：浏览器中的代码编辑器，支持新增文件及文件夹
+- 代码编辑
+  - 代码编辑
+  - [monaco-editor](https://fxss5201.github.io/vue-components/#/codeEditor/monaco-editor-page)
 - tabs滚动
 - 文字识别（[tesseract.js](https://github.com/naptha/tesseract.js)）

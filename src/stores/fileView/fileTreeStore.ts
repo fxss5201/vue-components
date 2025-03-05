@@ -2,6 +2,8 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { getIconForFile, getIconForFolder, getIconForOpenFolder } from 'vscode-icons-js'
 import { ElMessage } from 'element-plus'
+import { readFileAsText } from '@/utils/fileReader'
+import { mdFileTypeList, codeFileTypeList } from '@/config/fileConfig'
 
 import { useCurrentFileStore } from '@/stores/fileView/currentFileStore'
 import { useFileTabsStore } from '@/stores/fileView/fileTabsStore'
@@ -122,6 +124,18 @@ export async function getFileList(dirHandle: FileSystemDirectoryHandle, parentKe
       })
       if (imgListFileNode.length > 0) {
         curObj.imgListFileNode = imgListFileNode
+      }
+    } else {
+      const fileType = handelEle.name.split('.').pop() || ''
+      if (mdFileTypeList.includes(fileType) || codeFileTypeList.includes(fileType)) {
+        const file = await (handelEle as FileSystemFileHandle).getFile()
+        let fileReader: FileReader['result']
+        try {
+          fileReader = await readFileAsText(file)
+          curObj.fileContent = fileReader
+        } catch (error) {
+          console.log(error)
+        }
       }
     }
 

@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { UploadFilled } from '@element-plus/icons-vue'
 import { ElUpload, ElImage } from 'element-plus'
 import type { UploadFile, UploadFiles, UploadInstance } from 'element-plus' 
@@ -152,7 +152,7 @@ function doImgChangeFn (uploadFiles: ImgItem[]) {
 
 const tesseractLoading = ref(true)
 const tesseractLoadingText = ref('Loading ...')
-const worker = ref<Tesseract.Worker>()
+const worker = shallowRef<Tesseract.Worker>()
 const tesseractMinUrl = new URL('/tesseract/tesseract.min.js', import.meta.url).href
 const tesseractWasmUrl = new URL('/tesseract/tesseract-core-simd-lstm.wasm.js', import.meta.url).href
 async function initTesseract (langs?: string[]) {
