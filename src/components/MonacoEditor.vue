@@ -1,9 +1,11 @@
 <template>
-  <div ref="editorRef" :style="{ width: props.width, height: props.height }"></div>
+  <div ref="editorRef" :style="{ width: props.width, height: props.height }" v-on-key-stroke:c,s="onSaveFileFn"></div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
+import { vOnKeyStroke } from '@vueuse/components'
 import * as monaco from 'monaco-editor'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
@@ -33,17 +35,17 @@ export type Theme = 'vs' | 'hc-black' | 'vs-dark'
 export type FoldingStrategy = 'auto' | 'indentation'
 export type RenderLineHighlight = 'all' | 'line' | 'none' | 'gutter'
 export interface Options {
-  automaticLayout: boolean 
-  foldingStrategy: FoldingStrategy 
-  renderLineHighlight: RenderLineHighlight 
-  selectOnLineNumbers: boolean 
-  minimap: {
-    enabled: boolean
+  automaticLayout?: boolean 
+  foldingStrategy?: FoldingStrategy 
+  renderLineHighlight?: RenderLineHighlight 
+  selectOnLineNumbers?: boolean 
+  minimap?: {
+    enabled?: boolean
   }
-  readOnly: boolean 
-  fontSize: number 
-  scrollBeyondLastLine: boolean 
-  overviewRulerBorder: boolean 
+  readOnly?: boolean 
+  fontSize?: number 
+  scrollBeyondLastLine?: boolean 
+  overviewRulerBorder?: boolean 
 }
 
 const model = defineModel({ type: String, default: '' })
@@ -81,12 +83,25 @@ const props = withDefaults(
 const emit = defineEmits<{
   editorMounted: [editor: monaco.editor.IStandaloneCodeEditor]
   change: [value: string]
+  save: []
 }>()
 
 const editorRef = ref<HTMLElement>()
 let codeEditor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
 
 onMounted(() => {
+  // validation settings
+  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+    noSemanticValidation: true,
+    noSyntaxValidation: false,
+  })
+
+  // compiler options
+  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    target: monaco.languages.typescript.ScriptTarget.ES2015,
+    allowNonTsExtensions: true,
+  })
+
   codeEditor.value = monaco.editor.create(editorRef.value!, {
     ...props.options,
     value: model.value,
@@ -109,7 +124,7 @@ onUnmounted(() => {
 //   () => model.value,
 //   (newValue) => {
 //     const value = codeEditor.value?.getValue()
-//     if (newValue !== value) {
+//     if (!value) {
 //       codeEditor.value?.setValue(newValue)
 //     }
 //   }
@@ -141,6 +156,20 @@ watch(
     deep: true
   }
 )
+
+useResizeObserver(editorRef, (entries) => {
+  const entry = entries[0]
+  const { width, height } = entry.contentRect
+  codeEditor.value?.layout({
+    width,
+    height 
+  })
+})
+
+const onSaveFileFn = (e: KeyboardEvent) => {
+  e.preventDefault()
+  emit('save')
+}
 </script>
 
 <style lang="scss" scoped>

@@ -43,6 +43,7 @@ declare module 'vue' {
     JsonView: typeof import('./src/components/JsonView.vue')['default']
     MarkdownCard: typeof import('./src/components/MarkdownCard.vue')['default']
     MonacoEditor: typeof import('./src/components/MonacoEditor.vue')['default']
+    MonacoEditorCard: typeof import('./src/components/MonacoEditorCard.vue')['default']
     MonthCalendar: typeof import('./src/components/MonthCalendar.vue')['default']
     NoticeBar: typeof import('./src/components/NoticeBar.vue')['default']
     OfficeFileReader: typeof import('./src/components/OfficeFileReader.vue')['default']
