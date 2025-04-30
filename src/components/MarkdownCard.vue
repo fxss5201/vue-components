@@ -47,6 +47,7 @@ useCodeCopy()
     z-index: 1000;
     background-color: #fff;
     box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+    padding-right: 14px;
     a {
       &:hover {
         color: var(--el-color-primary);
