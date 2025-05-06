@@ -235,8 +235,8 @@ export default defineComponent({
       }
     },
     addRestrictionsFn (zoomDragContentMarginLeft: number, zoomDragContentMarginTop: number) {
-      const { width } = this.zoomDragWrap!.getBoundingClientRect()
-      const { width: contentWidth, height } = this.zoomDragContent!.getBoundingClientRect()
+      const { width, height } = this.zoomDragWrap!.getBoundingClientRect()
+      const { width: contentWidth, height: contentHeight } = this.zoomDragContent!.getBoundingClientRect()
       const zhengWidth = width - this.intersectionWidth
       const fuWidth = -1 * contentWidth + this.intersectionWidth
       if (zoomDragContentMarginLeft > zhengWidth) {
@@ -245,7 +245,7 @@ export default defineComponent({
         zoomDragContentMarginLeft = fuWidth
       }
       const zhengHeight = height - this.intersectionHeight
-      const fuHeight = -1 * height + this.intersectionHeight
+      const fuHeight = -1 * contentHeight + this.intersectionHeight
       if (zoomDragContentMarginTop > zhengHeight) {
         zoomDragContentMarginTop = zhengHeight
       } else if (zoomDragContentMarginTop < fuHeight) {
