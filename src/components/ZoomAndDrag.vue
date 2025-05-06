@@ -108,17 +108,21 @@ export default defineComponent({
     }
   },
   mounted () {
-    this.resizeObserver = new ResizeObserver(() => {
-      this.boxResizeChangeFn()
-    })
-    this.resizeObserver.observe(this.zoomDragWrap!)
-    this.$nextTick(() => {
-      this.changeZoomDragWrapSize()
-    })
+    if (this.zoomDragWrap) {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.boxResizeChangeFn()
+      })
+      this.resizeObserver.observe(this.zoomDragWrap!)
+      this.$nextTick(() => {
+        this.changeZoomDragWrapSize()
+      })
+    }
   },
   unmounted () {
-    this.resizeObserver?.unobserve(this.zoomDragWrap!)
-    this.resizeObserver = null
+    if (this.zoomDragWrap) {
+      this.resizeObserver?.unobserve(this.zoomDragWrap)
+      this.resizeObserver = null
+    }
   },
   emits: {
     mouseMoveChange(payload: EmitFnPalyload) {
@@ -186,9 +190,11 @@ export default defineComponent({
       }
     },
     changeZoomDragWrapSize () {
-      const { clientWidth, clientHeight } = this.zoomDragWrap!
-      this.zoomDragWrapWidth = clientWidth
-      this.zoomDragWrapHeight = clientHeight
+      if (this.zoomDragWrap) {
+        const { clientWidth, clientHeight } = this.zoomDragWrap
+        this.zoomDragWrapWidth = clientWidth
+        this.zoomDragWrapHeight = clientHeight
+      }
     },
     boxResizeChangeFn () {
       this.changeZoomDragWrapSize()

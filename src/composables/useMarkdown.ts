@@ -70,10 +70,18 @@ md.use(markdownItLinkAttributes, [
   },
   {
     matcher(href: string) {
+      return href.startsWith('./')
+    },
+    attrs: {
+      class: 'site-link'
+    },
+  },
+  {
+    matcher(href: string) {
       return href.startsWith('#')
     },
     attrs: {
-      class: 'cur-link'
+      class: 'anchor-link'
     },
   }
 ])

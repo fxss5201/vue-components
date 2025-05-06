@@ -1,9 +1,10 @@
 <template>
-  <div v-html="markdown" class="markdown-body"></div>
+  <div v-html="markdown" class="markdown-body" ref="markdownBodyRef"></div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useMarkdown } from '@/composables/useMarkdown'
 import { useCodeCopy } from '@/composables/useCodeCopy'
 
@@ -33,6 +34,59 @@ watch(
 )
 
 useCodeCopy()
+
+const router = useRouter()
+function addAClickFn (e: MouseEvent) {
+  const target = e.target as HTMLElement
+  if (target.tagName === 'A' && target.classList.contains('anchor-link')) {
+    e.preventDefault()
+    target.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start' 
+    })
+  } else if (target.tagName === 'A' && target.classList.contains('site-link')) {
+    e.preventDefault()
+    const href = target.getAttribute('href')?.slice(1)
+    if (href) {
+      router.push(href)
+    }
+  }
+}
+function addTocAClickFn (e: MouseEvent) {
+  const target = e.target as HTMLElement
+  if (target.tagName === 'A' && (target as HTMLLinkElement).getAttribute('href')?.startsWith('#')) {
+    e.preventDefault()
+    e.stopPropagation()
+    const href = (target as HTMLLinkElement).getAttribute('href')?.slice(1)
+    if (href) {
+      const el = document.getElementById(href)
+      if (el) {
+        el.scrollIntoView({
+          behavior:'smooth',
+          block:'start'
+        })
+      }
+    }
+  }
+  
+}
+const markdownBodyRef = ref<HTMLDivElement>()
+onMounted(() => {
+  nextTick(() => {
+    markdownBodyRef.value?.addEventListener('click', addAClickFn)
+    const toc: HTMLDivElement | null = document.querySelector('.table-of-contents')
+    if (toc) {
+      toc.addEventListener('click', addTocAClickFn)
+    }
+  }) 
+})
+onUnmounted(() => {
+  markdownBodyRef.value?.removeEventListener('click', addAClickFn) 
+  const toc: HTMLDivElement | null = document.querySelector('.table-of-contents')
+  if (toc) {
+    toc.removeEventListener('click', addTocAClickFn)
+  }
+})
 </script>
 
 <style lang="scss">
@@ -76,17 +130,18 @@ useCodeCopy()
       padding: 6px 8px;
     }
   }
-  a.blank-link {
+  a.blank-link,
+  a.site-link {
     color: var(--el-color-primary);
   }
-  a.cur-link {
+  a.anchor-link {
     &:hover {
       color: var(--el-color-primary);
     }
   }
   h1, h2, h3, h4, h5, h6 {
     &:hover {
-      a.cur-link {
+      a.anchor-link {
         color: var(--el-color-primary);
       }
     }
