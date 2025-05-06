@@ -2,8 +2,8 @@
   <div class="page-no-top-padding">
     <MarkdownCard :content="ZoomAndDragMd" />
     <div style="width: 100%; height: 680px;border: 1px solid #ccc;">
-      <ZoomAndDrag ref="ZoomAndDragRef" @mouseMoveChange="mouseMoveChangeFn" @zoomChange="zoomChangeFn">
-        <div class="row-list-box">
+      <ZoomAndDrag ref="ZoomAndDragRef" :zoomHeightFlag="true" @mouseMoveChange="mouseMoveChangeFn" @zoomChange="zoomChangeFn">
+        <div class="row-list-box" :style="{ height: `${boxHeight}px` }">
           <div v-for="row in list" :key="row.rowIndex" class="row-list">
             <div v-for="col in row.children" :key="`${col.rowIndex}-${col.columnIndex}`" class="col-list">
               <div class="col-body" :style="{ backgroundColor: col.backgroundColor }">{{ col.text }}</div>
@@ -53,17 +53,20 @@ onMounted(() => {
   })
 })
 
+const boxOldHeight = ref(680)
+const boxHeight = ref(680)
 function mouseMoveChangeFn(obj: EmitFnPalyload) {
-  console.log('mouseMoveChangeFn', obj) 
+  boxHeight.value = boxOldHeight.value * obj.zoom
+  console.log('mouseMoveChangeFn', obj)
 }
 function zoomChangeFn(obj: EmitFnPalyload) {
-  console.log('zoomChangeFn', obj) 
+  boxHeight.value = boxOldHeight.value * obj.zoom
+  console.log('zoomChangeFn', obj)
 }
 </script>
 
 <style lang="scss" scoped>
 .row-list-box {
-  height: 680px;
   .row-list {
     display: flex;
     flex-direction: row;

@@ -24,7 +24,7 @@ npm run dev
 - [编辑输入框](./contenteditableView)
 - [拖拽改变大小](./resizeCardView)
 - [是否需要提示](./tooltip)
-- [简单swiper](.simpleSwiper)
+- [简单swiper](./simpleSwiper)
 - [Echarts](./echartsView)
 - [公告栏](./noticeBar)
 - [类vscode实现](./fileView)：浏览器中的代码编辑器，支持新增文件及文件夹
