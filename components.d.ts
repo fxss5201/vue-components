@@ -54,6 +54,7 @@ declare module 'vue' {
     TabsScroll: typeof import('./src/components/TabsScroll.vue')['default']
     TerminalCard: typeof import('./src/components/TerminalCard.vue')['default']
     TerminalCardCopy: typeof import('./src/components/TerminalCardCopy.vue')['default']
+    ZoomAndDrag: typeof import('./src/components/ZoomAndDrag.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

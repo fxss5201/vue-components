@@ -196,6 +196,14 @@ export const routes: RouteRecordRaw[] = [
       title: '文字识别',
       iconfont: 'icon-tesseract'
     }
+  },
+  {
+    path: '/zoomAndDragView',
+    name: 'ZoomAndDragView',
+    component: () => import('../views/ZoomAndDragView.vue'),
+    meta: {
+      title: '拖拽缩放'
+    }
   }
 ]
 
