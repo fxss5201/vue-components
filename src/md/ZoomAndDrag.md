@@ -4,6 +4,24 @@
 * 支持拖拽
 * 按住键盘 `shift` 键 可以快速拖拽缩放
 
+## 原理
+
+ZoomAndDrag 组件仅提供拖拽缩放的壳子，通过计算出缩放后的内容的 `margin-left` 和 `margin-top` 来实现拖拽（基于 `transform` 实现），通过计算出缩放后的内容的 `width` 和 `height` 来实现缩放。
+
+ZoomAndDrag 组件的子元素需要动态设置 `height` ，初始化的 `height` 必须有值，在父组件中的生命周期 `onMounted` 中调用 `resetZoomFn` 方法初始化/重置缩放。
+
+``` ts
+onMounted(() => {
+  nextTick(() => {
+    ZoomAndDragRef.value?.resetZoomFn()
+  })
+})
+```
+
+ZoomAndDrag 组件的子元素 `width` 不需要设置，`width` 会根据父元素的 `width` 自适应，内部子元素通过 `flex` 布局实现自适应。
+
+**建议**：针对于子元素之间的间距，建议放在子元素内部，通过 `padding` 或者 `calc` 实现，避免子元素之间的间距影响缩放中心。
+
 ## props
 
 | 属性名 | 类型 | 默认值 | 说明 |
