@@ -204,6 +204,14 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: '拖拽缩放'
     }
+  },
+  {
+    path: '/pdfView',
+    name: 'PdfView',
+    component: () => import('../views/PdfView.vue'),
+    meta: {
+      title: 'pdf缩略图'
+    }
   }
 ]
 

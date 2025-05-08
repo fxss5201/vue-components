@@ -47,6 +47,7 @@ declare module 'vue' {
     MonthCalendar: typeof import('./src/components/MonthCalendar.vue')['default']
     NoticeBar: typeof import('./src/components/NoticeBar.vue')['default']
     OfficeFileReader: typeof import('./src/components/OfficeFileReader.vue')['default']
+    PdfThumbnail: typeof import('./src/components/PdfThumbnail.vue')['default']
     ResizeCard: typeof import('./src/components/ResizeCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
