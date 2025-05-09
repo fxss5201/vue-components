@@ -68,7 +68,6 @@ const renderThumbnail = async (pdfDoc: PDFDocumentProxy, pageNumber: number, can
     const imgIndices: string[] = []
     for (let i = 0; i < operatorList.fnArray.length; i++) {
       if ([pdfjsLib.OPS.paintImageXObject].includes(operatorList.fnArray[i])) {
-        console.table(operatorList.argsArray[i])
         imgIndices.push(operatorList.argsArray[i][0])
       }
     }
@@ -77,7 +76,7 @@ const renderThumbnail = async (pdfDoc: PDFDocumentProxy, pageNumber: number, can
       try {
         page.objs.get(imageName, (image: any) => {
           (async function () {
-            console.log('image:', image)
+            console.log(`渲染第 ${pageNumber + 1} 页image:`, image)
             const bmp = image.bitmap
             const { width, height } = bmp
             const canvas = new OffscreenCanvas(width, height)
@@ -97,7 +96,7 @@ const renderThumbnail = async (pdfDoc: PDFDocumentProxy, pageNumber: number, can
       }
     }
     const textContent = await page.getTextContent()
-    console.log('textContent:', textContent)
+    console.log(`渲染第 ${pageNumber + 1} 页textContent:`, textContent)
   } catch (error) {
     console.error(`渲染第 ${pageNumber + 1} 页缩略图时出错:`, error)
   }
