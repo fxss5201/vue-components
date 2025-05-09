@@ -1,16 +1,21 @@
 <template>
   <el-button plain @click="pefMergeFn" :disabled="loading">合成新的pdf</el-button>
-  <el-scrollbar height="100%"
-    :style="{ width: `${pdfThumbnailWidth}px` }"
-    class="pdf-thumbnail"
-    :noresize="true"
-  >
-    <div class="pdf-thumbnail-item" v-for="(page, index) in pageCount" :key="index">
-      <el-checkbox class="item-checkbox" :model-value="selectArray.includes(index)" @change="(val: boolean) => checkboxChangeFn(val, index)" />
-      <canvas class="item-canvas" :id="'pdf-thumbnail-' + index"></canvas>
-      <div class="item-page">{{ index + 1 }}</div>
-    </div>
-  </el-scrollbar>
+  <div style="height: calc(100vh - 130px);display: flex;">
+    <el-scrollbar height="100%"
+      :style="{ width: `${pdfThumbnailWidth}px` }"
+      class="pdf-thumbnail"
+      :noresize="true"
+    >
+      <div class="pdf-thumbnail-item" v-for="(page, index) in pageCount" :key="index">
+        <el-checkbox class="item-checkbox" :model-value="selectArray.includes(index)" @change="(val: boolean) => checkboxChangeFn(val, index)" />
+        <canvas class="item-canvas" :id="'pdf-thumbnail-' + index"></canvas>
+        <div class="item-page">{{ index + 1 }}</div>
+      </div>
+    </el-scrollbar>
+    <el-scrollbar height="100%" :noresize="true" :always="true" ref="scrollbarRef">
+      <div class="img-box"></div>
+    </el-scrollbar>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -20,6 +25,7 @@ import type { PDFDocumentProxy } from 'pdfjs-dist'
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?url'
 import { PDFDocument } from 'pdf-lib'
 import download from 'downloadjs'
+import { ElScrollbar } from 'element-plus'
 
 // 设置 worker 路径
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
@@ -28,6 +34,7 @@ const pdfUrl = new URL('/aaa.pdf', import.meta.url).href
 
 const pdfThumbnailWidth = ref(0)
 const pageCount = ref(0)
+const scrollbarRef = ref<InstanceType<typeof ElScrollbar>>()
 
 const renderThumbnail = async (pdfDoc: PDFDocumentProxy, pageNumber: number, canvasId: string) => {
   try {
@@ -44,12 +51,53 @@ const renderThumbnail = async (pdfDoc: PDFDocumentProxy, pageNumber: number, can
 
     pdfThumbnailWidth.value = viewport.width + 22
 
+    const outputScale = window.devicePixelRatio || 1
+    const transform = outputScale !== 1 
+      ? [outputScale, 0, 0, outputScale, 0, 0] 
+      : undefined
+
     // 渲染页面到 canvas
     const renderContext = {
       canvasContext: ctx,
-      viewport: viewport
+      viewport: viewport,
+      transform
     }
     await page.render(renderContext).promise
+    
+    const operatorList = await page.getOperatorList()
+    const imgIndices: string[] = []
+    for (let i = 0; i < operatorList.fnArray.length; i++) {
+      if ([pdfjsLib.OPS.paintImageXObject].includes(operatorList.fnArray[i])) {
+        console.table(operatorList.argsArray[i])
+        imgIndices.push(operatorList.argsArray[i][0])
+      }
+    }
+
+    for (const imageName of imgIndices) {
+      try {
+        page.objs.get(imageName, (image: any) => {
+          (async function () {
+            console.log('image:', image)
+            const bmp = image.bitmap
+            const { width, height } = bmp
+            const canvas = new OffscreenCanvas(width, height)
+            const ctx = canvas.getContext('bitmaprenderer')
+            ctx!.transferFromImageBitmap(bmp)
+            const blob = await canvas.convertToBlob()
+            const img = new Image()
+            img.width = width
+            img.height = height
+            img.src = URL.createObjectURL(blob)
+            document.querySelector('.img-box')?.appendChild(img)
+            scrollbarRef.value?.update()
+          }())
+        })
+      } catch (error) {
+        console.error(`获取第 ${pageNumber + 1} 页的图像对象时出错:`, error) 
+      }
+    }
+    const textContent = await page.getTextContent()
+    console.log('textContent:', textContent)
   } catch (error) {
     console.error(`渲染第 ${pageNumber + 1} 页缩略图时出错:`, error)
   }
@@ -63,6 +111,15 @@ onMounted(async () => {
     loading.value = true
     const pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise
     pageCount.value = pdfDoc.numPages
+    const outline = await pdfDoc.getOutline()
+    console.log('outline:', outline)
+    if (outline) {
+      for (let index = 0; index < outline.length; index++) {
+        const item = outline[index]
+        const pageIndex = await pdfDoc.getPageIndex(item.dest?.[0])
+        console.log('item:', item.title, pageIndex + 1)
+      }
+    }
 
     for (let i = 0; i < pageCount.value; i++) {
       const canvasId = `pdf-thumbnail-${i}`
@@ -100,6 +157,7 @@ const pefMergeFn = async () => {
 
 <style lang="scss" scoped>
 .pdf-thumbnail {
+  flex-shrink: 0;
   padding: 10px;
   border: 1px solid #ddd;
   overflow-x: hidden;
